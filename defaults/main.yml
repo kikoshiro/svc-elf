@@ -1,0 +1,34 @@
+---
+# defaults file for roles/svc-elk
+
+svc_elf__git_url: https://github.com/deviantony/docker-elk.git
+
+svc_elf__compose_project:            elf
+svc_elf__compose_dest:               "/home/{{ ansible_user }}/docker-compose-elf"
+
+svc_elf__https_key:  "{{ pki_cfssl__path_host_www_key }}"
+svc_elf__https_crt:  "{{ pki_cfssl__path_host_www_crt }}"
+
+svc_elf__elk_users:
+  admin:  "root$1234"
+
+svc_elf__elastic_username:  elastic
+svc_elf__elastic_password:  'root$1234'
+svc_elf__logstash_internal_password:  'root$1234'
+svc_elf__kibana_system_password:  'root$1234'
+svc_elf__metricbeat_internal_password:  'root$1234'
+svc_elf__filebeat_internal_password:  'root$1234'
+svc_elf__heartbeat_internal_password: 'root$1234'
+svc_elf__monitoring_internal_password:  'root$1234'
+svc_elf__beats_system_password: 'root$1234'
+
+
+
+svc_elf__elasticsearch_license: basic
+svc_elf__elasticsearch_security:  true
+
+
+svc_elf__kibana_server_publicbaseurl: "https://{{ inventory_hostname }}"
+
+svc_elf__pipelines:
+  - aruba-wlc

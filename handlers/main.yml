@@ -1,0 +1,18 @@
+---
+# handlers file for roles/svc-elk
+
+- name: elf-start
+  import_tasks: tasks/service.start.yml
+
+- name: elf-stop
+  import_tasks: tasks/service.stop.yml
+
+- name: elf-restart
+  import_tasks: tasks/service.restart.yml
+
+- name: elf-up
+  import_tasks: tasks/service.up.yml
+
+- name: elf-recreate
+  import_tasks: tasks/service.recreate.yml
+

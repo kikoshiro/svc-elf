@@ -1,0 +1,14 @@
+---
+
+- name: set_fact  svc_elf__elk_uri_auth_basic
+  set_fact:
+    svc_elf__pipeline_connection:
+      login_user:     "{{ svc_elf__elastic_username }}"
+      login_password: "{{ svc_elf__elastic_password }}"
+      auth_method:  http_auth
+      auth_scheme:  https
+      login_port:   9200
+      login_hosts:  "{{ inventory_hostname }}"
+    svc_elf__elk_uri_auth_basic:  "Basic {{ ( svc_elf__elastic_username + ':' + svc_elf__elastic_password ) | b64encode }}"
+
+

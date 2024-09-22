@@ -1,0 +1,52 @@
+---
+# tasks file for roles/svc-elk
+
+- include_tasks:  setup.elastic.status.yml
+
+- name: Retrieve current role configuration
+  uri:
+    url: "https://{{ inventory_hostname }}:9200/_security/role/filebeat_writer"
+    method: GET
+    return_content: yes
+    headers:
+      Authorization: "{{ svc_elf__elk_uri_auth_basic }}"
+  register: svc_elf__reg_elastic_roles
+  until: svc_elf__reg_elastic_roles.status == 200
+  retries: 3
+  delay: 5
+
+- debug:
+    var:   svc_elf__reg_elastic_roles.json
+
+- name: Modify role configuration
+  vars:
+    uri_body:  "{{
+            svc_elf__reg_elastic_roles.json.filebeat_writer
+            | combine( { 'cluster': ( svc_elf__reg_elastic_roles.json.filebeat_writer.cluster + [ 'manage_ingest_pipelines' ] ) } )
+            }}"
+  uri:
+    url: "https://{{ inventory_hostname }}:9200/_security/role/filebeat_writer"
+    method: PUT
+    return_content: yes
+
+    body_format: json
+    body: "{{ uri_body }}"
+    headers:
+      Authorization: "{{ svc_elf__elk_uri_auth_basic }}"
+    status_code: 200
+  when: >
+    svc_elf__reg_elastic_roles.status == 200 and
+    not "manage_ingest_pipelines" in svc_elf__reg_elastic_roles.json.filebeat_writer.cluster
+  register: current_response
+
+- debug:
+    var:  current_response
+
+#- name: Modify role configuration
+#  elasticsearch_role:
+#    name: filebeat_writer
+#    cluster_privileges:
+#      - manage_ingest_pipelines
+#      - manage_pipeline
+#  when: current_role_config.status == 200
+

@@ -1,0 +1,25 @@
+---
+
+- include_tasks:  setup.elastic.connection.yml
+
+- name: Create or update ingest pipeline in Elasticsearch
+  uri:
+    url: 'https://{{ inventory_hostname }}:9200/_ingest/pipeline/{{ item.path | lower | basename | regex_replace( "\.json$", "" ) }}'
+    method: PUT
+    headers:
+      Authorization: "{{ svc_elf__elk_uri_auth_basic }}"
+      Content-Type: "application/json"
+    body: "{{ lookup('file', '{{ item.src }}') }}"
+    status_code: 200, 201
+    body_format: json
+  register: result
+  delegate_to: 127.0.0.1
+  with_filetree:  "{{ role_path }}/files/pipelines/"
+  loop_control:
+    label: '{{ item.path }}'
+  when: item.state == 'file'
+
+- name: Debug the result
+  debug:
+    var: result
+

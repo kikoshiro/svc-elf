@@ -1,0 +1,51 @@
+{
+  "processors": [
+    {
+      "grok": {
+        "field": "cef.extensions.message",
+        "patterns": [
+          "srcip=%{IP:sourceAddress} srcport=%{NUMBER:sourcePort} dstip=%{IP:destinationAddress} dstport=%{NUMBER:destinationPort} action=%{WORD:deviceAction}",
+          "username=%{NOTSPACE:aruba.wlc.user.name} userip=%{IP:aruba.wlc.user.ip} usermac=%{NOTSPACE:aruba.wlc.user.mac} authmethod=%{WORD:aruba.wlc.authmethod} servername=%{NOTSPACE:aruba.wlc.server.name} serverip=%{IP:aruba.wlc.server.ip} apname=%{NOTSPACE:aruba.wlc.apname} bssid=%{NOTSPACE:aruba.wlc.bssid}"
+        ],
+        "ignore_failure": true
+      }
+    },
+    {
+      "rename": {
+        "field": "sourceAddress",
+        "target_field": "source.ip",
+        "ignore_failure": true
+      }
+    },
+    {
+      "rename": {
+        "field": "sourcePort",
+        "target_field": "source.port",
+        "ignore_failure": true
+      }
+    },
+    {
+      "rename": {
+        "field": "destinationAddress",
+        "target_field": "destination.ip",
+        "ignore_failure": true
+      }
+    },
+    {
+      "convert": {
+        "ignore_missing": true,
+        "field": "destinationPort",
+        "target_field": "destination.port",
+        "type": "long",
+        "ignore_failure": true
+      }
+    },
+    {
+      "rename": {
+        "field": "deviceAction",
+        "target_field": "cef.extensions.deviceAction",
+        "ignore_failure": true
+      }
+    }
+  ]
+}

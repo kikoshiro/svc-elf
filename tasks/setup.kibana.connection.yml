@@ -1,0 +1,7 @@
+---
+
+- name: set_fact  svc_elf__kibana_uri_auth_basic
+  set_fact:
+    svc_elf__kibana_uri_auth_basic:  "Basic {{ ( svc_elf__elastic_username + ':' + svc_elf__elastic_password ) | b64encode }}"
+
+

@@ -1,0 +1,60 @@
+---
+# tasks file for roles/svc-elk
+
+- name: setup
+  include_tasks:  setup.yml
+  when: "['all' ] | intersect(ansible_run_tags) | length > 0"
+
+- name: status
+  include_tasks: tasks/setup.status.yml
+  when: "['all', 'status'] | intersect(ansible_run_tags) | length > 0"
+
+- name: status
+  include_tasks: tasks/setup.import.yml
+  when: "['all', 'import'] | intersect(ansible_run_tags) | length > 0"
+
+
+#- name: dashboards
+#  include_tasks: tasks/setup.kibana.dashboards.yml
+#  when: "['all', 'dashboards'] | intersect(ansible_run_tags) | length > 0"
+
+#- name: pipelines
+#  include_tasks: tasks/setup.elastic.pipelines.yml
+#  when: "['all', 'pipelines'] | intersect(ansible_run_tags) | length > 0"
+#
+#- name: roles
+#  include_tasks: tasks/setup.elastic.roles.yml
+#  when: "['all', 'roles'] | intersect(ansible_run_tags) | length > 0"
+
+
+#- name: elf-start
+#  include_tasks: tasks/service.start.yml
+#  tags:
+#    - never
+#    - start
+#
+#- name: elf-stop
+#  include_tasks: tasks/service.stop.yml
+#  tags:
+#    - never
+#    - stop
+#
+#- name: elf-restart
+#  include_tasks: tasks/service.restart.yml
+#  tags:
+#    - never
+#    - restart
+#
+#- name: elf-up
+#  include_tasks: tasks/service.up.yml
+#  tags:
+#    - never
+#    - up
+#
+#- name: elf-recreate
+#  include_tasks: tasks/service.recreate.yml
+#  tags:
+#    - never
+#    - recreate
+
+

@@ -1,0 +1,23 @@
+---
+
+- include_tasks:  setup.kibana.connection.yml
+
+- name: Check Kibana API status
+  ansible.builtin.uri:
+    url: "https://{{ inventory_hostname }}/api/task_manager/_health"
+    method: GET
+    return_content: yes
+    headers:
+      Authorization: "{{ svc_elf__kibana_uri_auth_basic }}"
+  register: svc_elf__reg_kibana_status
+  until:    svc_elf__reg_kibana_status.status == 200 and svc_elf__reg_kibana_status.json.status == "OK"
+  retries: 10
+  delay: 5
+  check_mode: false
+
+- debug:
+    var:  svc_elf__reg_kibana_status.status
+
+- debug:
+    var:  svc_elf__reg_kibana_status.json.status
+

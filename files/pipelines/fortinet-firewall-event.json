@@ -1,0 +1,386 @@
+{
+  "processors": [
+    {
+      "set": {
+        "field": "event.kind",
+        "value": "event"
+      }
+    },
+    {
+      "set": {
+        "field": "event.action",
+        "value": "{{fortinet.firewall.action}}",
+        "ignore_empty_value": true
+      }
+    },
+    {
+      "set": {
+        "if": "ctx.fortinet?.firewall?.result == 'ERROR' || ctx.fortinet?.firewall?.status == 'negotiate_error'",
+        "field": "event.outcome",
+        "value": "failure"
+      }
+    },
+    {
+      "set": {
+        "field": "event.outcome",
+        "value": "success",
+        "if": "ctx.fortinet?.firewall?.result == 'OK' || ['FSSO-logon', 'auth-logon', 'FSSO-logoff', 'auth-logout'].contains(ctx.fortinet?.firewall?.action)"
+      }
+    },
+    {
+      "append": {
+        "allow_duplicates": false,
+        "if": "['FSSO-logon', 'auth-logon'].contains(ctx.fortinet?.firewall?.action)",
+        "field": "event.type",
+        "value": [
+          "user",
+          "start"
+        ]
+      }
+    },
+    {
+      "append": {
+        "field": "event.type",
+        "value": [
+          "user",
+          "end"
+        ],
+        "allow_duplicates": false,
+        "if": "['FSSO-logoff', 'auth-logout'].contains(ctx.fortinet?.firewall?.action)"
+      }
+    },
+    {
+      "append": {
+        "allow_duplicates": false,
+        "if": "ctx.fortinet?.firewall?.subtype == 'vpn'",
+        "field": "event.type",
+        "value": "connection"
+      }
+    },
+    {
+      "append": {
+        "field": "event.category",
+        "value": "network",
+        "allow_duplicates": false,
+        "if": "ctx.fortinet?.firewall?.subtype == 'vpn'"
+      }
+    },
+    {
+      "append": {
+        "value": "info",
+        "allow_duplicates": false,
+        "if": "ctx.fortinet?.firewall?.action == 'perf-stats'",
+        "field": "event.type"
+      }
+    },
+    {
+      "append": {
+        "field": "event.category",
+        "value": "host",
+        "if": "ctx.fortinet?.firewall?.action == 'perf-stats'"
+      }
+    },
+    {
+      "append": {
+        "allow_duplicates": false,
+        "if": "ctx.fortinet?.firewall?.subtype == 'update'",
+        "field": "event.type",
+        "value": "info"
+      }
+    },
+    {
+      "append": {
+        "field": "event.category",
+        "value": [
+          "host",
+          "malware"
+        ],
+        "allow_duplicates": false,
+        "if": "ctx.fortinet?.firewall?.subtype == 'update'"
+      }
+    },
+    {
+      "append": {
+        "if": "ctx.fortinet?.firewall?.subtype == 'user'",
+        "field": "event.category",
+        "value": "authentication",
+        "allow_duplicates": false
+      }
+    },
+    {
+      "rename": {
+        "field": "fortinet.firewall.dstip",
+        "target_field": "destination.ip",
+        "ignore_missing": true
+      }
+    },
+    {
+      "rename": {
+        "field": "fortinet.firewall.remip",
+        "target_field": "destination.ip",
+        "ignore_missing": true,
+        "if": "ctx.destination?.ip == null"
+      }
+    },
+    {
+      "convert": {
+        "type": "long",
+        "ignore_failure": true,
+        "ignore_missing": true,
+        "field": "fortinet.firewall.dstport",
+        "target_field": "destination.port"
+      }
+    },
+    {
+      "convert": {
+        "ignore_failure": true,
+        "ignore_missing": true,
+        "if": "ctx.destination?.port == null",
+        "field": "fortinet.firewall.remport",
+        "target_field": "destination.port",
+        "type": "long"
+      }
+    },
+    {
+      "convert": {
+        "ignore_missing": true,
+        "field": "fortinet.firewall.rcvdbyte",
+        "target_field": "destination.bytes",
+        "type": "long",
+        "ignore_failure": true
+      }
+    },
+    {
+      "rename": {
+        "field": "fortinet.firewall.daddr",
+        "target_field": "destination.address",
+        "ignore_missing": true
+      }
+    },
+    {
+      "rename": {
+        "target_field": "destination.address",
+        "ignore_missing": true,
+        "if": "ctx.destination?.address == null",
+        "field": "fortinet.firewall.dst_host"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "if": "ctx.destination?.address == null",
+        "field": "fortinet.firewall.dst_host",
+        "target_field": "destination.domain"
+      }
+    },
+    {
+      "convert": {
+        "field": "fortinet.firewall.sentbyte",
+        "target_field": "source.bytes",
+        "type": "long",
+        "ignore_failure": true,
+        "ignore_missing": true
+      }
+    },
+    {
+      "rename": {
+        "field": "fortinet.firewall.srcip",
+        "target_field": "source.ip",
+        "ignore_missing": true
+      }
+    },
+    {
+      "rename": {
+        "field": "fortinet.firewall.locip",
+        "target_field": "source.ip",
+        "ignore_missing": true,
+        "if": "ctx.source?.ip == null"
+      }
+    },
+    {
+      "rename": {
+        "field": "fortinet.firewall.srcmac",
+        "target_field": "source.mac",
+        "ignore_missing": true
+      }
+    },
+    {
+      "rename": {
+        "field": "fortinet.firewall.source_mac",
+        "target_field": "source.mac",
+        "ignore_missing": true,
+        "if": "ctx.source?.mac == null"
+      }
+    },
+    {
+      "convert": {
+        "ignore_missing": true,
+        "field": "fortinet.firewall.srcport",
+        "target_field": "source.port",
+        "type": "long",
+        "ignore_failure": true
+      }
+    },
+    {
+      "convert": {
+        "field": "fortinet.firewall.locport",
+        "target_field": "source.port",
+        "type": "long",
+        "ignore_failure": true,
+        "ignore_missing": true,
+        "if": "ctx.source?.port == null"
+      }
+    },
+    {
+      "rename": {
+        "field": "fortinet.firewall.user",
+        "target_field": "source.user.name",
+        "ignore_missing": true
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "fortinet.firewall.saddr",
+        "target_field": "source.address"
+      }
+    },
+    {
+      "rename": {
+        "field": "fortinet.firewall.file",
+        "target_field": "file.name",
+        "ignore_missing": true
+      }
+    },
+    {
+      "convert": {
+        "type": "long",
+        "ignore_failure": true,
+        "ignore_missing": true,
+        "field": "fortinet.firewall.filesize",
+        "target_field": "file.size"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "fortinet.firewall.level",
+        "target_field": "log.level"
+      }
+    },
+    {
+      "rename": {
+        "if": "ctx.event?.code == null",
+        "field": "fortinet.firewall.logid",
+        "target_field": "event.code",
+        "ignore_missing": true
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "fortinet.firewall.policyid",
+        "target_field": "rule.id"
+      }
+    },
+    {
+      "rename": {
+        "field": "fortinet.firewall.dir",
+        "target_field": "network.direction",
+        "ignore_missing": true,
+        "if": "ctx.network?.direction == null"
+      }
+    },
+    {
+      "rename": {
+        "target_field": "network.direction",
+        "ignore_missing": true,
+        "if": "ctx.network?.direction == null",
+        "field": "fortinet.firewall.direction"
+      }
+    },
+    {
+      "script": {
+        "lang": "painless",
+        "ignore_failure": true,
+        "params": {
+          "outgoing": "outbound",
+          "incoming": "inbound"
+        },
+        "source": "if (ctx.network?.direction == null) {\n  return;\n} def k = ctx.network?.direction.toLowerCase(); def normalized = params.get(k); if (normalized != null) {\n  ctx.network.direction = normalized;\n  return\n} ctx.network.direction = k;"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "fortinet.firewall.error_num",
+        "target_field": "error.code"
+      }
+    },
+    {
+      "rename": {
+        "field": "fortinet.firewall.logdesc",
+        "target_field": "rule.description",
+        "ignore_missing": true
+      }
+    },
+    {
+      "rename": {
+        "target_field": "fortinet.firewall.addrgrp",
+        "if": "ctx.rule?.description == 'Dynamic address updated'",
+        "ignore_missing": true,
+        "field": "fortinet.firewall.addr"
+      }
+    },
+    {
+      "rename": {
+        "field": "fortinet.firewall.url",
+        "target_field": "url.path",
+        "ignore_missing": true
+      }
+    },
+    {
+      "convert": {
+        "if": "ctx.event?.duration == null",
+        "field": "fortinet.firewall.sess_duration",
+        "type": "long",
+        "target_field": "event.duration",
+        "ignore_failure": true,
+        "ignore_missing": true
+      }
+    },
+    {
+      "convert": {
+        "type": "integer",
+        "ignore_failure": true,
+        "ignore_missing": true,
+        "field": "fortinet.firewall.mem"
+      }
+    },
+    {
+      "remove": {
+        "field": [
+          "fortinet.firewall.dstport",
+          "fortinet.firewall.remport",
+          "fortinet.firewall.rcvdbyte",
+          "fortinet.firewall.sentbyte",
+          "fortinet.firewall.srcport",
+          "fortinet.firewall.locport",
+          "fortinet.firewall.filesize",
+          "fortinet.firewall.sess_duration",
+          "fortinet.firewall.dir",
+          "fortinet.firewall.direction"
+        ],
+        "ignore_missing": true
+      }
+    }
+  ],
+  "on_failure": [
+    {
+      "set": {
+        "field": "error.message",
+        "value": "{{ _ingest.on_failure_message }}"
+      }
+    }
+  ]
+}

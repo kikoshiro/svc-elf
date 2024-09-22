@@ -1,0 +1,27 @@
+---
+# tasks file for roles/svc-elk
+
+- name: Import saved objects
+  uri:
+    url: https://{{ inventory_hostname }}/api/saved_objects/_import?overwrite=true
+    method: POST
+    user:     "{{ svc_elf__elastic_username }}"
+    password: "{{ svc_elf__elastic_password }}"
+    force_basic_auth: yes
+    headers:
+      kbn-xsrf: true
+    body_format: form-multipart
+    body:
+      file:
+        filename: "{{ item.src }}"
+  register: result
+  delegate_to: 127.0.0.1
+  with_filetree:  "{{ role_path }}/files/dashboards/"
+  loop_control:
+    label: '{{ item.path }}'
+  when: item.state == 'file'
+
+- name: Debug the result
+  debug:
+    var: result
+

@@ -1,0 +1,44 @@
+---
+
+- name: set_fact  svc_elf__kibana_uri_auth_basic
+  set_fact:
+    svc_elf__kibana_uri_auth_basic:  "Basic {{ ( svc_elf__elastic_username + ':' + svc_elf__elastic_password ) | b64encode }}"
+
+
+#- name: command curl |  Import saved objects into Kibana
+#  local_action:
+#    module: shell
+#    cmd:  |
+#      curl -s -u "$svc_elf__elastic_username:$svc_elf__elastic_password" -F "file=@{{ item.src }}" -H "kbn-xsrf: true" "https://{{ inventory_hostname }}/api/saved_objects/_import?overwrite=true"
+#  environment:
+#    svc_elf__elastic_username:  "{{ svc_elf__elastic_username }}"
+#    svc_elf__elastic_password:  "{{ svc_elf__elastic_password }}"
+#  with_filetree: "{{ role_path }}/files/saved_objects/"
+#  loop_control:
+#    label: '{{ item.path }}'
+#  when: item.state == 'file'
+#  register: result
+
+
+- name: uri | Import saved objects
+  local_action:
+    module: uri
+    url: https://{{ inventory_hostname }}/api/saved_objects/_import?overwrite=true
+    method: POST
+    body_format: form-multipart
+    status_code: 200, 201
+    headers:
+      Authorization: "{{ svc_elf__kibana_uri_auth_basic }}"
+      kbn-xsrf: "reporting"
+    body:
+      file:
+        filename: "{{ item.path }}"
+        content: "{{ lookup('ansible.builtin.file', item.src) }}"
+        mime_type: application/octet-stream
+  register: result
+  with_filetree: "{{ role_path }}/files/saved_objects/"
+  loop_control:
+    label: '{{ item.path }}'
+  when: item.state == 'file'
+
+

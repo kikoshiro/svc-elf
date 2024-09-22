@@ -1,0 +1,659 @@
+---
+# tasks file for roles/svc-elk
+
+- name: "STAT: {{ svc_elf__compose_dest }}"
+  ansible.builtin.stat:
+    path: "{{ svc_elf__compose_dest }}"
+  register: svc_elf__reg_compose_dest
+
+- import_role:
+    name:   debian.srvc-docker
+
+- name: file directory
+  file:
+    state:  directory
+    path: "{{ item }}"
+  become: no
+  loop:
+    - "{{ svc_elf__compose_dest }}"
+
+- name: import_role debian.base-packages
+  import_role:
+    name:   debian.base-packages
+  vars:
+    BASE_PACKAGES__DEB:
+      - git
+      - ssl-cert
+
+- debug:
+    var:  svc_elf__reg_compose_dest
+
+- name: git svc_elf__git_url
+  when: not svc_elf__reg_compose_dest.stat.exists
+  ansible.builtin.git:
+    repo: "{{ svc_elf__git_url }}"
+    dest: "{{ svc_elf__compose_dest }}"
+    version:  "{{ svc_elf__git_release | d( omit ) }}"
+
+- name: copy remote certs
+#  when: ( svc_elf__https_key | d( false ) ) and ( svc_elf__https_crt | d( false ) )
+  copy:
+    owner:  "{{ ansible_user }}"
+    group:  "{{ ansible_user }}"
+    remote_src: "{{ false if ( svc_elf__https_key | d( false ) ) and ( svc_elf__https_crt | d( false ) ) else true }}"
+    src:  "{{ item.value }}"
+    dest: "{{ svc_elf__compose_dest }}/https.{{ item.key}}"
+  with_dict:
+    key:  "{{ svc_elf__https_key | d( '/etc/ssl/private/ssl-cert-snakeoil.key' ) }}"
+    crt:  "{{ svc_elf__https_crt | d( '/etc/ssl/certs/ssl-cert-snakeoil.pem' ) }}"
+  notify: elf-restart
+
+- name: "copy {{ copy_dest }}"
+  vars:
+    copy_dest:  "{{ svc_elf__compose_dest }}/docker-compose.override.yml"
+  copy:
+    dest: "{{ copy_dest }}"
+    content:  |
+      services:
+
+        elasticsearch:
+          container_name: elasticsearch
+          ports:  !reset []
+        logstash: 
+          container_name: logstash
+          ports: !override
+            - 5044:5044
+            - 50000:50000/tcp
+            - 50000:50000/udp
+        kibana:
+          container_name: kibana
+          ports:
+            - 5601
+        caddy:
+          container_name: caddy
+          restart: always
+          image: caddy:2-alpine
+          volumes:
+            - "{{ svc_elf__compose_dest }}/caddyfile:/etc/caddy/Caddyfile:ro"
+            - "{{ svc_elf__compose_dest }}/https.key:/etc/ssl/private/key.key:ro,z"
+            - "{{ svc_elf__compose_dest }}/https.crt:/etc/ssl/private/crt.crt:ro,z"
+          networks:
+            - elk
+          ports:
+            - 80:80
+            - 443:443
+            - 9200:9200
+            - 9600:9600
+
+        # ElastiFlow Unified Collector
+        flow-collector:
+          image: elastiflow/flow-collector:6.1.3
+          container_name: flow-collector
+          restart: 'unless-stopped'
+          network_mode: 'host'
+          volumes:
+            - /etc/elastiflow:/etc/elastiflow
+          environment:
+            EF_LICENSE_ACCEPTED: 'true'
+            #EF_ACCOUNT_ID: ''
+
+            #EF_FLOW_LICENSE_KEY: ''
+            #EF_FLOW_LICENSED_UNITS:
+
+            #EF_INSTANCE_NAME: default
+            #EF_METRICS_PORT: 8080
+            #EF_METRICS_TLS_ENABLE: ''
+            #EF_METRICS_TLS_CERT_FILEPATH: ''
+            #EF_METRICS_TLS_KEY_FILEPATH: ''
+
+            #EF_LOGGER_LEVEL: 'info'
+            #EF_LOGGER_ENCODING: 'json'
+            #EF_LOGGER_FILE_LOG_ENABLE: 'false'
+            #EF_LOGGER_FILE_LOG_FILENAME: '/var/log/elastiflow/flowcoll/flowcoll.log'
+            #EF_LOGGER_FILE_LOG_MAX_SIZE: 100
+            #EF_LOGGER_FILE_LOG_MAX_AGE: ''
+            #EF_LOGGER_FILE_LOG_MAX_BACKUPS: 4
+            #EF_LOGGER_FILE_LOG_COMPRESS: 'false'
+
+            EF_FLOW_SERVER_UDP_IP: '0.0.0.0'
+            EF_FLOW_SERVER_UDP_PORT: 9995
+            #EF_FLOW_SERVER_UDP_READ_BUFFER_MAX_SIZE: 134217728
+
+            #EF_FLOW_PACKET_STREAM_MAX_SIZE:
+
+            EF_AWS_VPC_FLOW_LOG_ENABLE: 'false'
+            #EF_AWS_VPC_FLOW_LOG_S3_BUCKET: ''
+            #EF_AWS_VPC_FLOW_LOG_PREFIX: 'AWSLogs'
+            #AWS_REGION: ''
+            #AWS_ACCESS_KEY_ID: ''
+            #AWS_SECRET_ACCESS_KEY: ''
+
+            EF_INPUT_SNMP_ENABLE: 'false'
+            EF_PROCESSOR_SNMP_ENUM_ENABLE: 'false' # should be true when EF_INPUT_SNMP_ENABLE is true.
+            #EF_INPUT_SNMP_POLLER_WORKER_POOL_SIZE:  # defaults to the number of CPU threads * 4
+            #EF_INPUT_SNMP_DEVICE_DEFINITIONS_DIRECTORY_PATH: '/etc/elastiflow/snmp/devices'
+            #EF_INPUT_SNMP_DEVICE_GROUP_DEFINITIONS_DIRECTORY_PATH: '/etc/elastiflow/snmp/device_groups'
+            #EF_INPUT_SNMP_OBJECT_GROUP_DEFINITIONS_DIRECTORY_PATH: '/etc/elastiflow/snmp/object_groups'
+            #EF_INPUT_SNMP_OBJECT_DEFINITIONS_DIRECTORY_PATH: '/etc/elastiflow/snmp/objects'
+            #EF_PROCESSOR_SNMP_ENUM_DEFINITIONS_DIRECTORY_PATH: '/etc/elastiflow/snmp/enums'
+
+            #EF_PROCESSOR_POOL_SIZE:
+
+            #EF_PROCESSOR_DECODE_IPFIX_ENABLE: 'true'
+            #EF_PROCESSOR_DECODE_NETFLOW1_ENABLE: 'true'
+            #EF_PROCESSOR_DECODE_NETFLOW5_ENABLE: 'true'
+            #EF_PROCESSOR_DECODE_NETFLOW6_ENABLE: 'true'
+            #EF_PROCESSOR_DECODE_NETFLOW7_ENABLE: 'true'
+            #EF_PROCESSOR_DECODE_NETFLOW9_ENABLE: 'true'
+            #EF_PROCESSOR_DECODE_SFLOW5_ENABLE: 'true'
+            #EF_PROCESSOR_DECODE_SFLOW_FLOWS_ENABLE: 'true'
+            #EF_PROCESSOR_DECODE_SFLOW_FLOWS_KEEP_SAMPLES: 'false'
+            #EF_PROCESSOR_DECODE_SFLOW_COUNTERS_ENABLE: 'true'
+            #EF_PROCESSOR_DECODE_MAX_RECORDS_PER_PACKET: 64
+
+            #EF_PROCESSOR_TRANSLATE_KEEP_IDS: 'default'
+
+            EF_PROCESSOR_ENRICH_APP_ID_ENABLE: 'false'
+            #EF_PROCESSOR_ENRICH_APP_ID_PATH: '/etc/elastiflow/app/appid.yml'
+            #EF_PROCESSOR_ENRICH_APP_ID_TTL: 7200
+            EF_PROCESSOR_ENRICH_APP_IPPORT_ENABLE: 'false'
+            #EF_PROCESSOR_ENRICH_APP_IPPORT_PATH: '/etc/elastiflow/app/ipport.yml'
+            #EF_PROCESSOR_ENRICH_APP_IPPORT_TTL: 7200
+            #EF_PROCESSOR_ENRICH_APP_IPPORT_PRIVATE: 'true'
+            #EF_PROCESSOR_ENRICH_APP_IPPORT_PUBLIC: 'false'
+            #EF_PROCESSOR_ENRICH_APP_REFRESH_RATE: 15
+
+            #EF_PROCESSOR_ENRICH_IPADDR_TTL: 7200
+
+            EF_PROCESSOR_ENRICH_IPADDR_METADATA_ENABLE: 'false'
+            #EF_PROCESSOR_ENRICH_IPADDR_METADATA_USERDEF_PATH: '/etc/elastiflow/metadata/ipaddrs.yml'
+            #EF_PROCESSOR_ENRICH_IPADDR_METADATA_REFRESH_RATE: 15
+
+            EF_PROCESSOR_ENRICH_IPADDR_DNS_ENABLE: 'false'
+            EF_PROCESSOR_ENRICH_IPADDR_DNS_NAMESERVER_IP: ''
+            EF_PROCESSOR_ENRICH_IPADDR_DNS_NAMESERVER_TIMEOUT: 3000
+            #EF_PROCESSOR_ENRICH_IPADDR_DNS_RESOLVE_PRIVATE: 'true'
+            #EF_PROCESSOR_ENRICH_IPADDR_DNS_RESOLVE_PUBLIC: 'true'
+            #EF_PROCESSOR_ENRICH_IPADDR_DNS_USERDEF_PATH: '/etc/elastiflow/hostname/user_defined.yml'
+            #EF_PROCESSOR_ENRICH_IPADDR_DNS_USERDEF_REFRESH_RATE: 15
+            #EF_PROCESSOR_ENRICH_IPADDR_DNS_INCLEXCL_PATH: '/etc/elastiflow/hostname/incl_excl.yml'
+            #EF_PROCESSOR_ENRICH_IPADDR_DNS_INCLEXCL_REFRESH_RATE: 15
+
+            EF_PROCESSOR_ENRICH_IPADDR_MAXMIND_ASN_ENABLE: 'false'
+            #EF_PROCESSOR_ENRICH_IPADDR_MAXMIND_ASN_PATH: '/etc/elastiflow/maxmind/GeoLite2-ASN.mmdb'
+
+            EF_PROCESSOR_ENRICH_IPADDR_MAXMIND_GEOIP_ENABLE: 'false'
+            #EF_PROCESSOR_ENRICH_IPADDR_MAXMIND_GEOIP_PATH: '/etc/elastiflow/maxmind/GeoLite2-City.mmdb'
+            #EF_PROCESSOR_ENRICH_IPADDR_MAXMIND_GEOIP_VALUES: 'city,country,country_code,location,timezone'
+            #EF_PROCESSOR_ENRICH_IPADDR_MAXMIND_GEOIP_LANG: 'en'
+            #EF_PROCESSOR_ENRICH_IPADDR_MAXMIND_GEOIP_INCLEXCL_PATH: '/etc/elastiflow/maxmind/incl_excl.yml'
+            #EF_PROCESSOR_ENRICH_IPADDR_MAXMIND_GEOIP_INCLEXCL_REFRESH_RATE: 15
+
+            EF_PROCESSOR_ENRICH_IPADDR_RISKIQ_ASN_ENABLE: 'false'
+            #EF_PROCESSOR_ENRICH_IPADDR_RISKIQ_ASN_ENDPOINT: 'https://api.passivetotal.org/v2/netflow/as/download'
+            #EF_PROCESSOR_ENRICH_IPADDR_RISKIQ_ASN_REFRESH_INTERVAL: 1440
+            EF_PROCESSOR_ENRICH_IPADDR_RISKIQ_THREAT_ENABLE: 'false'
+            #EF_PROCESSOR_ENRICH_IPADDR_RISKIQ_THREAT_ENDPOINT: 'https://api.passivetotal.org/v2/netflow/blocklist/download'
+            #EF_PROCESSOR_ENRICH_IPADDR_RISKIQ_THREAT_REFRESH_INTERVAL: 1440
+            #EF_PROCESSOR_ENRICH_IPADDR_RISKIQ_THREAT_INCLEXCL_PATH: '/etc/elastiflow/riskiq/incl_excl.yml'
+            #EF_PROCESSOR_ENRICH_IPADDR_RISKIQ_THREAT_INCLEXCL_REFRESH_RATE: 15
+            #EF_PROCESSOR_ENRICH_IPADDR_RISKIQ_API_USER: ''
+            #EF_PROCESSOR_ENRICH_IPADDR_RISKIQ_API_KEY: ''
+            #EF_PROCESSOR_ENRICH_IPADDR_RISKIQ_API_TIMEOUT: 180
+
+            #EF_PROCESSOR_ENRICH_ASN_PREF: 'lookup'
+
+            #EF_PROCESSOR_ENRICH_NETIF_METADATA_ENABLE: 'false'
+            #EF_PROCESSOR_ENRICH_NETIF_METADATA_USERDEF_PATH: '/etc/elastiflow/metadata/ipaddrs.yml'
+            #EF_PROCESSOR_ENRICH_NETIF_METADATA_REFRESH_RATE: 15
+
+            EF_PROCESSOR_ENRICH_NETIF_FLOW_OPTIONS_ENABLE: 'true'
+
+            EF_PROCESSOR_ENRICH_NETIF_SNMP_ENABLE: 'false'
+            #EF_PROCESSOR_ENRICH_NETIF_SNMP_PORT: 161
+            #EF_PROCESSOR_ENRICH_NETIF_SNMP_VERSION: 2
+            EF_PROCESSOR_ENRICH_NETIF_SNMP_COMMUNITIES: 'public'
+            #EF_PROCESSOR_ENRICH_NETIF_SNMP_TIMEOUT: 2
+            #EF_PROCESSOR_ENRICH_NETIF_SNMP_RETRIES: 1
+
+            #EF_PROCESSOR_ENRICH_TOTALS_IF_NO_DELTAS: 'false'
+
+            #EF_PROCESSOR_ENRICH_SAMPLERATE_CACHE_SIZE: 32768
+            #EF_PROCESSOR_ENRICH_SAMPLERATE_USERDEF_ENABLE: 'false'
+            #EF_PROCESSOR_ENRICH_SAMPLERATE_USERDEF_PATH: '/etc/elastiflow/settings/sample_rate.yml'
+            #EF_PROCESSOR_ENRICH_SAMPLERATE_USERDEF_OVERRIDE: 'false'
+
+            #EF_PROCESSOR_ENRICH_COMMUNITYID_ENABLE: 'true'
+            #EF_PROCESSOR_ENRICH_COMMUNITYID_SEED: 0
+            #EF_PROCESSOR_ENRICH_CONVERSATIONID_ENABLE: 'true'
+            #EF_PROCESSOR_ENRICH_CONVERSATIONID_SEED: 0
+
+            #EF_PROCESSOR_ENRICH_JOIN_ASN: 'true'
+            #EF_PROCESSOR_ENRICH_JOIN_GEOIP: 'true'
+            #EF_PROCESSOR_ENRICH_JOIN_SEC: 'true'
+            #EF_PROCESSOR_ENRICH_JOIN_NETATTR: 'true'
+            #EF_PROCESSOR_ENRICH_JOIN_SUBNETATTR: 'true'
+
+            #EF_PROCESSOR_DURATION_PRECISION: 'ms'
+            #EF_PROCESSOR_TIMESTAMP_PRECISION: 'ms'
+            #EF_PROCESSOR_PERCENT_NORM: 100
+            #EF_PROCESSOR_EXPAND_CLISRV: 'true'
+            #EF_PROCESSOR_EXPAND_CLISRV_NO_L4_PORTS: 'true'
+            #EF_PROCESSOR_KEEP_CPU_TICKS: 'false'
+
+            #EF_PROCESSOR_DROP_FIELDS: ''
+
+            # stdout
+            #EF_OUTPUT_STDOUT_ENABLE: 'false'
+            #EF_OUTPUT_STDOUT_FORMAT: 'json_pretty'
+
+            # monitor
+            #EF_OUTPUT_MONITOR_ENABLE: 'false'
+            #EF_OUTPUT_MONITOR_INTERVAL: 300
+
+            # Elasticsearch
+            EF_OUTPUT_ELASTICSEARCH_ENABLE: 'true'
+            EF_OUTPUT_ELASTICSEARCH_ECS_ENABLE: 'true'
+            #EF_OUTPUT_ELASTICSEARCH_BATCH_DEADLINE: 2000
+            #EF_OUTPUT_ELASTICSEARCH_BATCH_MAX_BYTES: 8388608
+            EF_OUTPUT_ELASTICSEARCH_TIMESTAMP_SOURCE: 'start'
+            EF_OUTPUT_ELASTICSEARCH_INDEX_PERIOD: 'rollover'
+            #EF_OUTPUT_ELASTICSEARCH_INDEX_SUFFIX: ''
+            #EF_OUTPUT_ELASTICSEARCH_DROP_FIELDS: ''
+
+            #EF_OUTPUT_ELASTICSEARCH_INDEX_TEMPLATE_ENABLE: 'true'
+            #EF_OUTPUT_ELASTICSEARCH_INDEX_TEMPLATE_OVERWRITE: 'true'
+            EF_OUTPUT_ELASTICSEARCH_INDEX_TEMPLATE_SHARDS: 1
+            EF_OUTPUT_ELASTICSEARCH_INDEX_TEMPLATE_REPLICAS: 0
+            #EF_OUTPUT_ELASTICSEARCH_INDEX_TEMPLATE_REFRESH_INTERVAL: '10s'
+            #EF_OUTPUT_ELASTICSEARCH_INDEX_TEMPLATE_CODEC: 'best_compression'
+            #EF_OUTPUT_ELASTICSEARCH_INDEX_TEMPLATE_ILM_LIFECYCLE: ''
+            #EF_OUTPUT_ELASTICSEARCH_INDEX_TEMPLATE_PIPELINE_DEFAULT: '_none'
+            #EF_OUTPUT_ELASTICSEARCH_INDEX_TEMPLATE_PIPELINE_FINAL: '_none'
+
+            # A comma separated list of Elasticsearch nodes to use. DO NOT include "http://" or "https://"
+            EF_OUTPUT_ELASTICSEARCH_ADDRESSES: 'bvxh05elf01.ivu-ag.com:9200'
+            EF_OUTPUT_ELASTICSEARCH_USERNAME: '{{ svc_elf__elastic_username }}'
+            EF_OUTPUT_ELASTICSEARCH_PASSWORD: '{{ svc_elf__elastic_password }}'
+            #EF_OUTPUT_ELASTICSEARCH_CLOUD_ID: ''
+            #EF_OUTPUT_ELASTICSEARCH_API_KEY: ''
+            #EF_OUTPUT_ELASTICSEARCH_CLIENT_CA_CERT_FILEPATH:
+            #EF_OUTPUT_ELASTICSEARCH_CLIENT_CERT_FILEPATH:
+            #EF_OUTPUT_ELASTICSEARCH_CLIENT_KEY_FILEPATH:
+
+            EF_OUTPUT_ELASTICSEARCH_TLS_ENABLE: 'true'
+            EF_OUTPUT_ELASTICSEARCH_TLS_SKIP_VERIFICATION: 'true'
+            EF_OUTPUT_ELASTICSEARCH_TLS_CA_CERT_FILEPATH: ''
+
+            #EF_OUTPUT_ELASTICSEARCH_RETRY_ENABLE: 'true'
+            #EF_OUTPUT_ELASTICSEARCH_RETRY_ON_TIMEOUT_ENABLE: 'true'
+            #EF_OUTPUT_ELASTICSEARCH_MAX_RETRIES: 3
+            #EF_OUTPUT_ELASTICSEARCH_RETRY_BACKOFF: 1000
+
+            # OpenSearch
+            EF_OUTPUT_OPENSEARCH_ENABLE: 'false'
+            EF_OUTPUT_OPENSEARCH_ECS_ENABLE: 'false'
+            #EF_OUTPUT_OPENSEARCH_BATCH_DEADLINE: 2000
+            #EF_OUTPUT_OPENSEARCH_BATCH_MAX_BYTES: 8388608
+            #EF_OUTPUT_OPENSEARCH_TIMESTAMP_SOURCE: 'end'
+            #EF_OUTPUT_OPENSEARCH_INDEX_PERIOD: 'daily'
+            #EF_OUTPUT_OPENSEARCH_INDEX_SUFFIX: ''
+            #EF_OUTPUT_OPENSEARCH_DROP_FIELDS: ''
+
+            #EF_OUTPUT_OPENSEARCH_INDEX_TEMPLATE_ENABLE: 'true'
+            #EF_OUTPUT_OPENSEARCH_INDEX_TEMPLATE_OVERWRITE: 'true'
+            EF_OUTPUT_OPENSEARCH_INDEX_TEMPLATE_SHARDS: 1
+            EF_OUTPUT_OPENSEARCH_INDEX_TEMPLATE_REPLICAS: 0
+            #EF_OUTPUT_OPENSEARCH_INDEX_TEMPLATE_REFRESH_INTERVAL: '10s'
+            #EF_OUTPUT_OPENSEARCH_INDEX_TEMPLATE_CODEC: 'best_compression'
+            #EF_OUTPUT_OPENSEARCH_INDEX_TEMPLATE_ISM_POLICY: ''
+            #EF_OUTPUT_OPENSEARCH_INDEX_TEMPLATE_PIPELINE_DEFAULT: '_none'
+            #EF_OUTPUT_OPENSEARCH_INDEX_TEMPLATE_PIPELINE_FINAL: '_none'
+
+            # A comma separated list of OpenSearch nodes to use. DO NOT include "http://" or "https://"
+            EF_OUTPUT_OPENSEARCH_ADDRESSES: '127.0.0.1:9200'
+            EF_OUTPUT_OPENSEARCH_USERNAME: 'elastic'
+            EF_OUTPUT_OPENSEARCH_PASSWORD: 'changeme'
+            #EF_OUTPUT_OPENSEARCH_CLIENT_CA_CERT_FILEPATH:
+            #EF_OUTPUT_OPENSEARCH_CLIENT_CERT_FILEPATH:
+            #EF_OUTPUT_OPENSEARCH_CLIENT_KEY_FILEPATH:
+
+            EF_OUTPUT_OPENSEARCH_TLS_ENABLE: 'false'
+            EF_OUTPUT_OPENSEARCH_TLS_SKIP_VERIFICATION: 'false'
+            EF_OUTPUT_OPENSEARCH_TLS_CA_CERT_FILEPATH: ''
+
+            #EF_OUTPUT_OPENSEARCH_RETRY_ENABLE: 'true'
+            #EF_OUTPUT_OPENSEARCH_RETRY_ON_TIMEOUT_ENABLE: 'true'
+            #EF_OUTPUT_OPENSEARCH_MAX_RETRIES: 3
+            #EF_OUTPUT_OPENSEARCH_RETRY_BACKOFF: 1000
+
+            # Splunk
+            EF_OUTPUT_SPLUNK_HEC_ENABLE: 'false'
+            #EF_OUTPUT_SPLUNK_HEC_CIM_ENABLE: 'false'
+            EF_OUTPUT_SPLUNK_HEC_ADDRESSES: '127.0.0.1:8088'
+            EF_OUTPUT_SPLUNK_HEC_TOKEN: ''
+            #EF_OUTPUT_SPLUNK_HEC_BATCH_MAX_BYTES: 8388608
+            #EF_OUTPUT_SPLUNK_HEC_BATCH_DEADLINE: 2000
+            #EF_OUTPUT_SPLUNK_HEC_TLS_ENABLE: 'true'
+            #EF_OUTPUT_SPLUNK_HEC_TLS_SKIP_VERIFICATION: 'false'
+            #EF_OUTPUT_SPLUNK_HEC_TLS_CA_CERT_FILEPATH: ''
+            #EF_OUTPUT_SPLUNK_HEC_DROP_FIELDS: ''
+
+            # Kafka
+            EF_OUTPUT_KAFKA_ENABLE: 'false'
+            EF_OUTPUT_KAFKA_BROKERS: ''
+            #EF_OUTPUT_KAFKA_VERSION: '1.0.0'
+            #EF_OUTPUT_KAFKA_TOPIC: 'elastiflow-flow-codex'
+            #EF_OUTPUT_KAFKA_PARTITION_KEY: 'flow.export.ip.addr'
+            #EF_OUTPUT_KAFKA_CLIENT_ID: 'elastiflow-flowcoll'
+            #EF_OUTPUT_KAFKA_RACK_ID: ''
+            #EF_OUTPUT_KAFKA_TIMEOUT: 30
+            #EF_OUTPUT_KAFKA_DROP_FIELDS: ''
+
+            EF_OUTPUT_KAFKA_SASL_ENABLE: 'false'
+            #EF_OUTPUT_KAFKA_SASL_USERNAME: ''
+            #EF_OUTPUT_KAFKA_SASL_PASSWORD: ''
+
+            #EF_OUTPUT_KAFKA_TLS_ENABLE: 'false'
+            #EF_OUTPUT_KAFKA_TLS_CA_CERT_FILEPATH: ''
+            #EF_OUTPUT_KAFKA_TLS_CERT_FILEPATH: ''
+            #EF_OUTPUT_KAFKA_TLS_KEY_FILEPATH: ''
+            #EF_OUTPUT_KAFKA_TLS_SKIP_VERIFICATION: 'false'
+
+            #EF_OUTPUT_KAFKA_PRODUCER_MAX_MESSAGE_BYTES: 1000000
+            #EF_OUTPUT_KAFKA_PRODUCER_REQUIRED_ACKS: 1
+            #EF_OUTPUT_KAFKA_PRODUCER_TIMEOUT: 10
+            #EF_OUTPUT_KAFKA_PRODUCER_COMPRESSION: 0
+            #EF_OUTPUT_KAFKA_PRODUCER_COMPRESSION_LEVEL: -1000
+            #EF_OUTPUT_KAFKA_PRODUCER_FLUSH_BYTES: 1000000
+            #EF_OUTPUT_KAFKA_PRODUCER_FLUSH_MESSAGES: 1024
+            #EF_OUTPUT_KAFKA_PRODUCER_FLUSH_FREQUENCY: 500
+            #EF_OUTPUT_KAFKA_PRODUCER_FLUSH_MAX_MESSAGES: 0
+            #EF_OUTPUT_KAFKA_PRODUCER_RETRY_MAX: 3
+            #EF_OUTPUT_KAFKA_PRODUCER_RETRY_BACKOFF: 100
+
+            # Cribl
+            EF_OUTPUT_CRIBL_ENABLE: 'false'
+            EF_OUTPUT_CRIBL_ADDRESSES: '127.0.0.1:10080'
+            EF_OUTPUT_CRIBL_TOKEN: ''
+            #EF_OUTPUT_CRIBL_BATCH_DEADLINE: 2000
+            #EF_OUTPUT_CRIBL_BATCH_MAX_BYTES: 8388608
+            #EF_OUTPUT_CRIBL_TLS_ENABLE: 'false'
+            #EF_OUTPUT_CRIBL_TLS_SKIP_VERIFICATION: 'false'
+            #EF_OUTPUT_CRIBL_TLS_CA_CERT_FILEPATH: ''
+            #EF_OUTPUT_CRIBL_DROP_FIELDS: ''
+
+            # Generic HTTP
+            EF_OUTPUT_GENERIC_HTTP_ENABLE: 'false'
+            EF_OUTPUT_GENERIC_HTTP_ECS_ENABLE: 'false'
+            #EF_OUTPUT_GENERIC_HTTP_BATCH_DEADLINE: 2000
+            #EF_OUTPUT_GENERIC_HTTP_BATCH_MAX_BYTES: 8388608
+            EF_OUTPUT_GENERIC_HTTP_ADDRESSES: ''
+            #EF_OUTPUT_GENERIC_HTTP_USERNAME: ''
+            #EF_OUTPUT_GENERIC_HTTP_PASSWORD: ''
+            #EF_OUTPUT_GENERIC_HTTP_TLS_ENABLE: 'false'
+            #EF_OUTPUT_GENERIC_HTTP_TLS_SKIP_VERIFICATION: 'false'
+            #EF_OUTPUT_GENERIC_HTTP_TLS_CA_CERT_FILEPATH: ''
+            #EF_OUTPUT_GENERIC_HTTP_DROP_FIELDS: ''
+            #EF_OUTPUT_GENERIC_HTTP_TIMESTAMP_SOURCE: 'end'
+
+            # RiskIQ
+            EF_OUTPUT_RISKIQ_ENABLE: 'false'
+            #EF_OUTPUT_RISKIQ_HOST: ''
+            #EF_OUTPUT_RISKIQ_PORT:
+            #EF_OUTPUT_RISKIQ_CUSTOMER_UUID: ''
+            #EF_OUTPUT_RISKIQ_CUSTOMER_ENCRYPTION_KEY: ''
+
+
+
+  notify: elf-restart
+
+- name: "copy {{ copy_dest }}"
+  vars:
+    copy_dest:  "{{ svc_elf__compose_dest }}/caddyfile"
+  copy:
+    dest: "{{ copy_dest }}"
+    content:  |
+      :443 {
+          reverse_proxy kibana:5601
+          encode gzip zstd
+
+          tls /etc/ssl/private/crt.crt /etc/ssl/private/key.key
+          log {
+            level error
+          }
+      }
+      :9200 {
+          reverse_proxy elasticsearch:9200
+          encode gzip zstd
+      
+          tls /etc/ssl/private/crt.crt /etc/ssl/private/key.key
+          log {
+            level error
+          }
+      }
+      :9600 {
+          reverse_proxy logstash:9600
+          encode gzip zstd
+
+          tls /etc/ssl/private/crt.crt /etc/ssl/private/key.key
+          log {
+            level error
+          }
+      }
+      #:9090 {
+      #    reverse_proxy elk:9090
+      #    encode gzip zstd
+
+      #    tls /etc/ssl/private/crt.crt /etc/ssl/private/key.key
+      #    log {
+      #      level error
+      #    }
+      #}
+      :80 {
+          redir https://{host}{uri}
+      }
+  notify: elf-restart
+
+- name: "lineinfile {{ lineinfile_path }} xpack.license.self_generated.type"
+  vars:
+    lineinfile_path:  "{{ svc_elf__compose_dest }}/elasticsearch/config/elasticsearch.yml"
+  ansible.builtin.lineinfile:
+    path: "{{ lineinfile_path }}"
+    regexp: '^xpack.license.self_generated.type:'
+    line: "xpack.license.self_generated.type: {{ svc_elf__elasticsearch_license }}"
+
+- name: "lineinfile {{ lineinfile_path }} xpack.security.enabled"
+  vars:
+    lineinfile_path:  "{{ svc_elf__compose_dest }}/elasticsearch/config/elasticsearch.yml"
+  ansible.builtin.lineinfile:
+    path: "{{ lineinfile_path }}"
+    regexp: '^xpack.security.enabled:'
+    line: "xpack.security.enabled: {{ svc_elf__elasticsearch_security | lower }}"
+
+- name: "lineinfile {{ lineinfile_path }} server.publicBaseUrl"
+  vars:
+    lineinfile_path:  "{{ svc_elf__compose_dest }}/kibana/config/kibana.yml"
+  ansible.builtin.lineinfile:
+    path: "{{ lineinfile_path }}"
+    regexp: '^server.publicBaseUrl:'
+    line: "server.publicBaseUrl: {{ svc_elf__kibana_server_publicbaseurl | lower }}"
+
+- name: lineinfile .env ELASTIC_PASSWORD
+  ansible.builtin.lineinfile:
+    path: "{{ svc_elf__compose_dest }}/.env"
+    regexp: '^ELASTIC_PASSWORD='
+    line: "ELASTIC_PASSWORD='{{ svc_elf__elastic_password }}'"
+
+- name: lineinfile .env LOGSTASH_INTERNAL_PASSWORD
+  ansible.builtin.lineinfile:
+    path: "{{ svc_elf__compose_dest }}/.env"
+    regexp: '^LOGSTASH_INTERNAL_PASSWORD='
+    line: "LOGSTASH_INTERNAL_PASSWORD='{{ svc_elf__logstash_internal_password }}'"
+
+- name: lineinfile .env KIBANA_SYSTEM_PASSWORD
+  ansible.builtin.lineinfile:
+    path: "{{ svc_elf__compose_dest }}/.env"
+    regexp: '^KIBANA_SYSTEM_PASSWORD='
+    line: "KIBANA_SYSTEM_PASSWORD='{{ svc_elf__kibana_system_password }}'"
+
+- name: lineinfile .env METRICBEAT_INTERNAL_PASSWORD
+  ansible.builtin.lineinfile:
+    path: "{{ svc_elf__compose_dest }}/.env"
+    regexp: '^METRICBEAT_INTERNAL_PASSWORD='
+    line: "METRICBEAT_INTERNAL_PASSWORD='{{ svc_elf__metricbeat_internal_password }}'"
+
+- name: lineinfile .env FILEBEAT_INTERNAL_PASSWORD
+  ansible.builtin.lineinfile:
+    path: "{{ svc_elf__compose_dest }}/.env"
+    regexp: '^FILEBEAT_INTERNAL_PASSWORD='
+    line: "FILEBEAT_INTERNAL_PASSWORD='{{ svc_elf__filebeat_internal_password }}'"
+
+- name: lineinfile .env HEARTBEAT_INTERNAL_PASSWORD
+  ansible.builtin.lineinfile:
+    path: "{{ svc_elf__compose_dest }}/.env"
+    regexp: '^HEARTBEAT_INTERNAL_PASSWORD='
+    line: "HEARTBEAT_INTERNAL_PASSWORD='{{ svc_elf__heartbeat_internal_password }}'"
+
+- name: lineinfile .env MONITORING_INTERNAL_PASSWORD
+  ansible.builtin.lineinfile:
+    path: "{{ svc_elf__compose_dest }}/.env"
+    regexp: '^MONITORING_INTERNAL_PASSWORD='
+    line: "MONITORING_INTERNAL_PASSWORD='{{ svc_elf__monitoring_internal_password }}'"
+
+- name: lineinfile .env BEATS_SYSTEM_PASSWORD
+  ansible.builtin.lineinfile:
+    path: "{{ svc_elf__compose_dest }}/.env"
+    regexp: '^BEATS_SYSTEM_PASSWORD='
+    line: "BEATS_SYSTEM_PASSWORD='{{ svc_elf__beats_system_password }}'"
+
+
+### Start the Cluster
+
+- name: command
+  when: not svc_elf__reg_compose_dest.stat.exists
+  command:
+    cmd:    "{{ item }}"
+    chdir:  "{{ svc_elf__compose_dest }}"
+  loop:
+    - docker compose up setup
+    - docker compose up -d
+  become: no
+
+#- name: Create and start services
+#  when: not svc_elf__reg_compose_dest.stat.exists
+#  community.docker.docker_compose:
+#    project_src:  "{{ svc_elf__compose_dest }}"
+
+- name: Get infos on container
+  community.docker.docker_container_info: 
+    name: elasticsearch
+  register: result
+
+- debug:
+    var:  result
+
+- include_tasks:  setup.status.yml
+
+
+#- name: set_fact  svc_elf__kibana_uri_auth_basic
+#  set_fact:
+#    svc_elf__kibana_uri_auth_basic:  "Basic {{ ( svc_elf__elastic_username + ':' + svc_elf__elastic_password ) | b64encode }}"
+#
+#
+#- name: Import saved objects
+#  uri:
+#    url: https://{{ inventory_hostname }}/api/saved_objects/_import?overwrite=true
+#    method: POST
+#    user: "{{ svc_elf__elastic_username }}"
+#    password: "{{ svc_elf__elastic_password }}"
+#    force_basic_auth: yes
+#    headers:
+#      kbn-xsrf: true
+#    body_format: form-multipart
+#    body: >
+#      {{ lookup('file',item.path) }}
+##      file:
+##        src: "{{ item.src }}"
+##        filename: "{{ item.path }}"
+##        content_type: application/ndjson
+##lookup('file','myvalues.json')
+#  register: result
+#  delegate_to: 127.0.0.1
+#  with_filetree: "{{ role_path }}/files/saved_objects/"
+#  loop_control:
+#    label: '{{ item.path }}'
+#  when: item.state == 'file'
+
+
+
+#- name: Import saved objects
+#  uri:
+#    url: https://{{ inventory_hostname }}/api/saved_objects/_import?overwrite=true
+#    method: POST
+#    user: "{{ svc_elf__elastic_username }}"
+#    password: "{{ svc_elf__elastic_password }}"
+#    force_basic_auth: yes
+#    headers:
+#      kbn-xsrf: true
+#    body_format: form-multipart
+#    body:
+#      file:
+#        src: "{{ item.src }}"
+#        filename: "{{ item.path }}"
+#        content_type: application/ndjson
+#  register: result
+#  delegate_to: 127.0.0.1
+#  with_filetree: "{{ role_path }}/files/saved_objects/"
+#  loop_control:
+#    label: '{{ item.path }}'
+#  when: item.state == 'file'
+
+
+#- name: Import saved objects
+#  uri:
+#    url: https://{{ inventory_hostname }}/api/saved_objects/_import?overwrite=true
+#    method: POST
+#    user:     "{{ svc_elf__elastic_username }}"
+#    password: "{{ svc_elf__elastic_password }}"
+#    force_basic_auth: yes
+#    headers:
+#      kbn-xsrf: true
+#    #body_format: form-multipart
+#    body_format: json
+#    body:
+#      file:
+#        filename: "{{ item.src }}"
+#  register: result
+#  delegate_to: 127.0.0.1
+#  with_filetree:  "{{ role_path }}/files/saved_objects/"
+#  loop_control:
+#    label: '{{ item.path }}'
+#  when: item.state == 'file'
+
+- name: Debug the result
+  debug:
+
+
+
+#- name: Create or update saved_objects
+#  uri:
+#    url: https://{{ inventory_hostname }}/api/saved_objects/_import?overwrite=true
+#    method: PUT
+#    headers:
+#      Authorization: "{{ svc_elf__kibana_uri_auth_basic }}"
+#      Content-Type: "application/json"
+#    body: "{{ lookup('file', '{{ item.src }}') }}"
+#    status_code: 200, 201
+#    body_format: json
+#  register: result
+#  delegate_to: 127.0.0.1
+#  with_filetree:  "{{ role_path }}/files/saved_objects"
+#  loop_control:
+#    label: '{{ item.path }}'
+#  when: item.state == 'file'
+#
+#- name: Debug the result
+#  debug:
+#    var: result
+#

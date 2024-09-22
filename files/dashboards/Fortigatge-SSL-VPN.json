@@ -1,0 +1,193 @@
+{
+    "version": "8.12.2",
+    "objects": [
+        {
+            "id": "02239ee8-4aac-4456-a702-baedc971d04f",
+            "type": "dashboard",
+            "namespaces": [
+                "default"
+            ],
+            "updated_at": "2024-08-30T13:09:29.232Z",
+            "created_at": "2024-03-27T15:31:34.054Z",
+            "version": "WzEzMTg3LDIzXQ==",
+            "attributes": {
+                "version": 1,
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[]}"
+                },
+                "description": "",
+                "timeRestore": false,
+                "optionsJSON": "{\"useMargins\":true,\"syncColors\":false,\"syncCursor\":true,\"syncTooltips\":false,\"hidePanelTitles\":false}",
+                "panelsJSON": "[{\"type\":\"lens\",\"gridData\":{\"x\":0,\"y\":0,\"w\":11,\"h\":18,\"i\":\"7f79f652-8d41-4bbf-b637-c31c4f51c618\"},\"panelIndex\":\"7f79f652-8d41-4bbf-b637-c31c4f51c618\",\"embeddableConfig\":{\"attributes\":{\"title\":\"\",\"visualizationType\":\"lnsDatatable\",\"type\":\"lens\",\"references\":[{\"type\":\"index-pattern\",\"id\":\"9847a50f-0acd-4182-8e6a-e285bde178db\",\"name\":\"indexpattern-datasource-layer-e479e4fa-dec1-4025-8b87-6374ed835fc8\"}],\"state\":{\"visualization\":{\"layerId\":\"e479e4fa-dec1-4025-8b87-6374ed835fc8\",\"layerType\":\"data\",\"columns\":[{\"columnId\":\"86d95f81-79b0-410a-8d77-f1baa7edec62\",\"isTransposed\":false,\"isMetric\":false},{\"columnId\":\"2454ffc9-c930-4020-9556-40327e7ca3d9\",\"isTransposed\":false,\"isMetric\":true},{\"columnId\":\"a6b2a2a4-0506-47e9-89eb-14d5764bb91b\",\"isTransposed\":false,\"isMetric\":false,\"hidden\":true}]},\"query\":{\"query\":\"fortinet.firewall.action : \\\"ssl-login-fail\\\" \",\"language\":\"kuery\"},\"filters\":[],\"datasourceStates\":{\"formBased\":{\"layers\":{\"e479e4fa-dec1-4025-8b87-6374ed835fc8\":{\"columns\":{\"86d95f81-79b0-410a-8d77-f1baa7edec62\":{\"label\":\"Top 10 values of destination.geo.country_name\",\"dataType\":\"string\",\"operationType\":\"terms\",\"scale\":\"ordinal\",\"sourceField\":\"destination.geo.country_name\",\"isBucketed\":true,\"params\":{\"size\":10,\"orderBy\":{\"type\":\"column\",\"columnId\":\"2454ffc9-c930-4020-9556-40327e7ca3d9\"},\"orderDirection\":\"desc\",\"otherBucket\":true,\"missingBucket\":false,\"parentFormat\":{\"id\":\"terms\"},\"include\":[],\"exclude\":[],\"includeIsRegex\":false,\"excludeIsRegex\":false}},\"2454ffc9-c930-4020-9556-40327e7ca3d9\":{\"label\":\"Count of destination.geo.country_name\",\"dataType\":\"number\",\"operationType\":\"count\",\"isBucketed\":false,\"scale\":\"ratio\",\"sourceField\":\"destination.geo.country_name\",\"params\":{\"emptyAsNull\":true}},\"a6b2a2a4-0506-47e9-89eb-14d5764bb91b\":{\"label\":\"Filters\",\"dataType\":\"string\",\"operationType\":\"filters\",\"scale\":\"ordinal\",\"isBucketed\":true,\"params\":{\"filters\":[{\"input\":{\"query\":\"fortinet.firewall.action : ssl-login-fail\",\"language\":\"kuery\"},\"label\":\"\"}]}}},\"columnOrder\":[\"86d95f81-79b0-410a-8d77-f1baa7edec62\",\"a6b2a2a4-0506-47e9-89eb-14d5764bb91b\",\"2454ffc9-c930-4020-9556-40327e7ca3d9\"],\"sampling\":1,\"ignoreGlobalFilters\":false,\"incompleteColumns\":{}}}},\"indexpattern\":{\"layers\":{}},\"textBased\":{\"layers\":{}}},\"internalReferences\":[],\"adHocDataViews\":{}}},\"hidePanelTitles\":false,\"enhancements\":{},\"timeRange\":{\"from\":\"now-30d/d\",\"to\":\"now\"}},\"title\":\"Top10 ssl-login-fail by country Last30D\"},{\"type\":\"lens\",\"gridData\":{\"x\":11,\"y\":0,\"w\":11,\"h\":18,\"i\":\"67c6033a-4c67-43d8-ba41-e9692cda823e\"},\"panelIndex\":\"67c6033a-4c67-43d8-ba41-e9692cda823e\",\"embeddableConfig\":{\"attributes\":{\"title\":\"\",\"visualizationType\":\"lnsDatatable\",\"type\":\"lens\",\"references\":[{\"type\":\"index-pattern\",\"id\":\"9847a50f-0acd-4182-8e6a-e285bde178db\",\"name\":\"indexpattern-datasource-layer-e479e4fa-dec1-4025-8b87-6374ed835fc8\"}],\"state\":{\"visualization\":{\"layerId\":\"e479e4fa-dec1-4025-8b87-6374ed835fc8\",\"layerType\":\"data\",\"columns\":[{\"columnId\":\"86d95f81-79b0-410a-8d77-f1baa7edec62\",\"isTransposed\":false,\"isMetric\":false},{\"columnId\":\"2454ffc9-c930-4020-9556-40327e7ca3d9\",\"isTransposed\":false,\"isMetric\":true},{\"columnId\":\"a6b2a2a4-0506-47e9-89eb-14d5764bb91b\",\"isTransposed\":false,\"isMetric\":false,\"hidden\":true}]},\"query\":{\"query\":\"fortinet.firewall.action : \\\"ssl-login-fail\\\" \",\"language\":\"kuery\"},\"filters\":[],\"datasourceStates\":{\"formBased\":{\"layers\":{\"e479e4fa-dec1-4025-8b87-6374ed835fc8\":{\"columns\":{\"86d95f81-79b0-410a-8d77-f1baa7edec62\":{\"label\":\"Top 10 values of destination.geo.country_name\",\"dataType\":\"string\",\"operationType\":\"terms\",\"scale\":\"ordinal\",\"sourceField\":\"destination.geo.country_name\",\"isBucketed\":true,\"params\":{\"size\":10,\"orderBy\":{\"type\":\"column\",\"columnId\":\"2454ffc9-c930-4020-9556-40327e7ca3d9\"},\"orderDirection\":\"desc\",\"otherBucket\":true,\"missingBucket\":false,\"parentFormat\":{\"id\":\"terms\"},\"include\":[],\"exclude\":[],\"includeIsRegex\":false,\"excludeIsRegex\":false}},\"2454ffc9-c930-4020-9556-40327e7ca3d9\":{\"label\":\"Count of destination.geo.country_name\",\"dataType\":\"number\",\"operationType\":\"count\",\"isBucketed\":false,\"scale\":\"ratio\",\"sourceField\":\"destination.geo.country_name\",\"params\":{\"emptyAsNull\":true}},\"a6b2a2a4-0506-47e9-89eb-14d5764bb91b\":{\"label\":\"Filters\",\"dataType\":\"string\",\"operationType\":\"filters\",\"scale\":\"ordinal\",\"isBucketed\":true,\"params\":{\"filters\":[{\"input\":{\"query\":\"fortinet.firewall.action : ssl-login-fail\",\"language\":\"kuery\"},\"label\":\"\"}]}}},\"columnOrder\":[\"86d95f81-79b0-410a-8d77-f1baa7edec62\",\"a6b2a2a4-0506-47e9-89eb-14d5764bb91b\",\"2454ffc9-c930-4020-9556-40327e7ca3d9\"],\"sampling\":1,\"ignoreGlobalFilters\":false,\"incompleteColumns\":{}}}},\"indexpattern\":{\"layers\":{}},\"textBased\":{\"layers\":{}}},\"internalReferences\":[],\"adHocDataViews\":{}}},\"hidePanelTitles\":false,\"enhancements\":{},\"timeRange\":{\"from\":\"now-7d/d\",\"to\":\"now\"}},\"title\":\"Top10 ssl-login-fail by country Last7Days\"},{\"type\":\"lens\",\"gridData\":{\"x\":22,\"y\":0,\"w\":11,\"h\":18,\"i\":\"e3b67f05-cb9a-4a39-ac60-6deb9440a537\"},\"panelIndex\":\"e3b67f05-cb9a-4a39-ac60-6deb9440a537\",\"embeddableConfig\":{\"attributes\":{\"title\":\"\",\"visualizationType\":\"lnsDatatable\",\"type\":\"lens\",\"references\":[{\"type\":\"index-pattern\",\"id\":\"9847a50f-0acd-4182-8e6a-e285bde178db\",\"name\":\"indexpattern-datasource-layer-e479e4fa-dec1-4025-8b87-6374ed835fc8\"}],\"state\":{\"visualization\":{\"layerId\":\"e479e4fa-dec1-4025-8b87-6374ed835fc8\",\"layerType\":\"data\",\"columns\":[{\"columnId\":\"86d95f81-79b0-410a-8d77-f1baa7edec62\",\"isTransposed\":false,\"isMetric\":false},{\"columnId\":\"2454ffc9-c930-4020-9556-40327e7ca3d9\",\"isTransposed\":false,\"isMetric\":true},{\"columnId\":\"a6b2a2a4-0506-47e9-89eb-14d5764bb91b\",\"isTransposed\":false,\"isMetric\":false,\"hidden\":true}]},\"query\":{\"query\":\"fortinet.firewall.action : \\\"ssl-login-fail\\\" \",\"language\":\"kuery\"},\"filters\":[],\"datasourceStates\":{\"formBased\":{\"layers\":{\"e479e4fa-dec1-4025-8b87-6374ed835fc8\":{\"columns\":{\"86d95f81-79b0-410a-8d77-f1baa7edec62\":{\"label\":\"Top 10 values of destination.geo.country_name\",\"dataType\":\"string\",\"operationType\":\"terms\",\"scale\":\"ordinal\",\"sourceField\":\"destination.geo.country_name\",\"isBucketed\":true,\"params\":{\"size\":10,\"orderBy\":{\"type\":\"column\",\"columnId\":\"2454ffc9-c930-4020-9556-40327e7ca3d9\"},\"orderDirection\":\"desc\",\"otherBucket\":true,\"missingBucket\":false,\"parentFormat\":{\"id\":\"terms\"},\"include\":[],\"exclude\":[],\"includeIsRegex\":false,\"excludeIsRegex\":false}},\"2454ffc9-c930-4020-9556-40327e7ca3d9\":{\"label\":\"Count of destination.geo.country_name\",\"dataType\":\"number\",\"operationType\":\"count\",\"isBucketed\":false,\"scale\":\"ratio\",\"sourceField\":\"destination.geo.country_name\",\"params\":{\"emptyAsNull\":true}},\"a6b2a2a4-0506-47e9-89eb-14d5764bb91b\":{\"label\":\"Filters\",\"dataType\":\"string\",\"operationType\":\"filters\",\"scale\":\"ordinal\",\"isBucketed\":true,\"params\":{\"filters\":[{\"input\":{\"query\":\"fortinet.firewall.action : ssl-login-fail\",\"language\":\"kuery\"},\"label\":\"\"}]}}},\"columnOrder\":[\"86d95f81-79b0-410a-8d77-f1baa7edec62\",\"a6b2a2a4-0506-47e9-89eb-14d5764bb91b\",\"2454ffc9-c930-4020-9556-40327e7ca3d9\"],\"sampling\":1,\"ignoreGlobalFilters\":false,\"incompleteColumns\":{}}}},\"indexpattern\":{\"layers\":{}},\"textBased\":{\"layers\":{}}},\"internalReferences\":[],\"adHocDataViews\":{}}},\"hidePanelTitles\":false,\"enhancements\":{},\"timeRange\":{\"from\":\"now-24h/h\",\"to\":\"now\"}},\"title\":\"Top10 ssl-login-fail by country Last24h\"},{\"type\":\"lens\",\"gridData\":{\"x\":33,\"y\":0,\"w\":11,\"h\":18,\"i\":\"c4cc157d-8433-43fc-838e-f52b137c8628\"},\"panelIndex\":\"c4cc157d-8433-43fc-838e-f52b137c8628\",\"embeddableConfig\":{\"attributes\":{\"title\":\"\",\"visualizationType\":\"lnsDatatable\",\"type\":\"lens\",\"references\":[{\"type\":\"index-pattern\",\"id\":\"9847a50f-0acd-4182-8e6a-e285bde178db\",\"name\":\"indexpattern-datasource-layer-e479e4fa-dec1-4025-8b87-6374ed835fc8\"}],\"state\":{\"visualization\":{\"layerId\":\"e479e4fa-dec1-4025-8b87-6374ed835fc8\",\"layerType\":\"data\",\"columns\":[{\"columnId\":\"86d95f81-79b0-410a-8d77-f1baa7edec62\",\"isTransposed\":false,\"isMetric\":false},{\"columnId\":\"2454ffc9-c930-4020-9556-40327e7ca3d9\",\"isTransposed\":false,\"isMetric\":true},{\"columnId\":\"a6b2a2a4-0506-47e9-89eb-14d5764bb91b\",\"isTransposed\":false,\"isMetric\":false,\"hidden\":true}]},\"query\":{\"query\":\"fortinet.firewall.action : \\\"ssl-login-fail\\\" \",\"language\":\"kuery\"},\"filters\":[],\"datasourceStates\":{\"formBased\":{\"layers\":{\"e479e4fa-dec1-4025-8b87-6374ed835fc8\":{\"columns\":{\"86d95f81-79b0-410a-8d77-f1baa7edec62\":{\"label\":\"Top 10 values of destination.geo.country_name\",\"dataType\":\"string\",\"operationType\":\"terms\",\"scale\":\"ordinal\",\"sourceField\":\"destination.geo.country_name\",\"isBucketed\":true,\"params\":{\"size\":10,\"orderBy\":{\"type\":\"column\",\"columnId\":\"2454ffc9-c930-4020-9556-40327e7ca3d9\"},\"orderDirection\":\"desc\",\"otherBucket\":true,\"missingBucket\":false,\"parentFormat\":{\"id\":\"terms\"},\"include\":[],\"exclude\":[],\"includeIsRegex\":false,\"excludeIsRegex\":false}},\"2454ffc9-c930-4020-9556-40327e7ca3d9\":{\"label\":\"Count of destination.geo.country_name\",\"dataType\":\"number\",\"operationType\":\"count\",\"isBucketed\":false,\"scale\":\"ratio\",\"sourceField\":\"destination.geo.country_name\",\"params\":{\"emptyAsNull\":true}},\"a6b2a2a4-0506-47e9-89eb-14d5764bb91b\":{\"label\":\"Filters\",\"dataType\":\"string\",\"operationType\":\"filters\",\"scale\":\"ordinal\",\"isBucketed\":true,\"params\":{\"filters\":[{\"input\":{\"query\":\"fortinet.firewall.action : ssl-login-fail\",\"language\":\"kuery\"},\"label\":\"\"}]}}},\"columnOrder\":[\"86d95f81-79b0-410a-8d77-f1baa7edec62\",\"a6b2a2a4-0506-47e9-89eb-14d5764bb91b\",\"2454ffc9-c930-4020-9556-40327e7ca3d9\"],\"sampling\":1,\"ignoreGlobalFilters\":false,\"incompleteColumns\":{}}}},\"indexpattern\":{\"layers\":{}},\"textBased\":{\"layers\":{}}},\"internalReferences\":[],\"adHocDataViews\":{}}},\"hidePanelTitles\":false,\"enhancements\":{},\"timeRange\":{\"from\":\"now-15m\",\"to\":\"now\"}},\"title\":\"Top10 ssl-login-fail by country Last15Min\"},{\"type\":\"lens\",\"gridData\":{\"x\":0,\"y\":18,\"w\":11,\"h\":18,\"i\":\"778fcadc-e595-4746-b1c6-2f0ebcd0d8e2\"},\"panelIndex\":\"778fcadc-e595-4746-b1c6-2f0ebcd0d8e2\",\"embeddableConfig\":{\"attributes\":{\"title\":\"\",\"visualizationType\":\"lnsDatatable\",\"type\":\"lens\",\"references\":[{\"type\":\"index-pattern\",\"id\":\"9847a50f-0acd-4182-8e6a-e285bde178db\",\"name\":\"indexpattern-datasource-layer-e479e4fa-dec1-4025-8b87-6374ed835fc8\"}],\"state\":{\"visualization\":{\"layerId\":\"e479e4fa-dec1-4025-8b87-6374ed835fc8\",\"layerType\":\"data\",\"columns\":[{\"columnId\":\"86d95f81-79b0-410a-8d77-f1baa7edec62\",\"isTransposed\":false,\"isMetric\":false},{\"columnId\":\"2454ffc9-c930-4020-9556-40327e7ca3d9\",\"isTransposed\":false,\"isMetric\":true},{\"columnId\":\"a6b2a2a4-0506-47e9-89eb-14d5764bb91b\",\"isTransposed\":false,\"isMetric\":false,\"hidden\":true}]},\"query\":{\"query\":\"fortinet.firewall.action : \\\"ssl-login-fail\\\" \",\"language\":\"kuery\"},\"filters\":[],\"datasourceStates\":{\"formBased\":{\"layers\":{\"e479e4fa-dec1-4025-8b87-6374ed835fc8\":{\"columns\":{\"86d95f81-79b0-410a-8d77-f1baa7edec62\":{\"label\":\"Top 10 values of related.ip\",\"dataType\":\"ip\",\"operationType\":\"terms\",\"scale\":\"ordinal\",\"sourceField\":\"related.ip\",\"isBucketed\":true,\"params\":{\"size\":10,\"orderBy\":{\"type\":\"column\",\"columnId\":\"2454ffc9-c930-4020-9556-40327e7ca3d9\"},\"orderDirection\":\"desc\",\"otherBucket\":true,\"missingBucket\":false,\"parentFormat\":{\"id\":\"terms\"},\"include\":[],\"exclude\":[],\"includeIsRegex\":false,\"excludeIsRegex\":false,\"secondaryFields\":[]}},\"2454ffc9-c930-4020-9556-40327e7ca3d9\":{\"label\":\"Count of related.ip\",\"dataType\":\"number\",\"operationType\":\"count\",\"isBucketed\":false,\"scale\":\"ratio\",\"sourceField\":\"related.ip\",\"params\":{\"emptyAsNull\":true}},\"a6b2a2a4-0506-47e9-89eb-14d5764bb91b\":{\"label\":\"Filters\",\"dataType\":\"string\",\"operationType\":\"filters\",\"scale\":\"ordinal\",\"isBucketed\":true,\"params\":{\"filters\":[{\"input\":{\"query\":\"fortinet.firewall.action : ssl-login-fail\",\"language\":\"kuery\"},\"label\":\"\"}]}}},\"columnOrder\":[\"86d95f81-79b0-410a-8d77-f1baa7edec62\",\"a6b2a2a4-0506-47e9-89eb-14d5764bb91b\",\"2454ffc9-c930-4020-9556-40327e7ca3d9\"],\"sampling\":1,\"ignoreGlobalFilters\":false,\"incompleteColumns\":{},\"indexPatternId\":\"9847a50f-0acd-4182-8e6a-e285bde178db\"}},\"currentIndexPatternId\":\"9847a50f-0acd-4182-8e6a-e285bde178db\"},\"indexpattern\":{\"layers\":{}},\"textBased\":{\"layers\":{}}},\"internalReferences\":[],\"adHocDataViews\":{}}},\"hidePanelTitles\":false,\"enhancements\":{},\"timeRange\":{\"from\":\"now-30d/d\",\"to\":\"now\"}},\"title\":\"Top10 ssl-login-fail by IP Last30Days\"},{\"type\":\"lens\",\"gridData\":{\"x\":11,\"y\":18,\"w\":11,\"h\":18,\"i\":\"a4252509-9017-482d-84dc-d258185f1a2e\"},\"panelIndex\":\"a4252509-9017-482d-84dc-d258185f1a2e\",\"embeddableConfig\":{\"attributes\":{\"title\":\"\",\"visualizationType\":\"lnsDatatable\",\"type\":\"lens\",\"references\":[{\"type\":\"index-pattern\",\"id\":\"9847a50f-0acd-4182-8e6a-e285bde178db\",\"name\":\"indexpattern-datasource-layer-e479e4fa-dec1-4025-8b87-6374ed835fc8\"}],\"state\":{\"visualization\":{\"layerId\":\"e479e4fa-dec1-4025-8b87-6374ed835fc8\",\"layerType\":\"data\",\"columns\":[{\"columnId\":\"86d95f81-79b0-410a-8d77-f1baa7edec62\",\"isTransposed\":false,\"isMetric\":false},{\"columnId\":\"2454ffc9-c930-4020-9556-40327e7ca3d9\",\"isTransposed\":false,\"isMetric\":true},{\"columnId\":\"a6b2a2a4-0506-47e9-89eb-14d5764bb91b\",\"isTransposed\":false,\"isMetric\":false,\"hidden\":true}]},\"query\":{\"query\":\"fortinet.firewall.action : \\\"ssl-login-fail\\\" \",\"language\":\"kuery\"},\"filters\":[],\"datasourceStates\":{\"formBased\":{\"layers\":{\"e479e4fa-dec1-4025-8b87-6374ed835fc8\":{\"columns\":{\"86d95f81-79b0-410a-8d77-f1baa7edec62\":{\"label\":\"Top 10 values of related.ip\",\"dataType\":\"ip\",\"operationType\":\"terms\",\"scale\":\"ordinal\",\"sourceField\":\"related.ip\",\"isBucketed\":true,\"params\":{\"size\":10,\"orderBy\":{\"type\":\"column\",\"columnId\":\"2454ffc9-c930-4020-9556-40327e7ca3d9\"},\"orderDirection\":\"desc\",\"otherBucket\":true,\"missingBucket\":false,\"parentFormat\":{\"id\":\"terms\"},\"include\":[],\"exclude\":[],\"includeIsRegex\":false,\"excludeIsRegex\":false,\"secondaryFields\":[]}},\"2454ffc9-c930-4020-9556-40327e7ca3d9\":{\"label\":\"Count of related.ip\",\"dataType\":\"number\",\"operationType\":\"count\",\"isBucketed\":false,\"scale\":\"ratio\",\"sourceField\":\"related.ip\",\"params\":{\"emptyAsNull\":true}},\"a6b2a2a4-0506-47e9-89eb-14d5764bb91b\":{\"label\":\"Filters\",\"dataType\":\"string\",\"operationType\":\"filters\",\"scale\":\"ordinal\",\"isBucketed\":true,\"params\":{\"filters\":[{\"input\":{\"query\":\"fortinet.firewall.action : ssl-login-fail\",\"language\":\"kuery\"},\"label\":\"\"}]}}},\"columnOrder\":[\"86d95f81-79b0-410a-8d77-f1baa7edec62\",\"a6b2a2a4-0506-47e9-89eb-14d5764bb91b\",\"2454ffc9-c930-4020-9556-40327e7ca3d9\"],\"sampling\":1,\"ignoreGlobalFilters\":false,\"incompleteColumns\":{},\"indexPatternId\":\"9847a50f-0acd-4182-8e6a-e285bde178db\"}},\"currentIndexPatternId\":\"9847a50f-0acd-4182-8e6a-e285bde178db\"},\"indexpattern\":{\"layers\":{}},\"textBased\":{\"layers\":{}}},\"internalReferences\":[],\"adHocDataViews\":{}}},\"hidePanelTitles\":false,\"enhancements\":{},\"timeRange\":{\"from\":\"now-7d/d\",\"to\":\"now\"}},\"title\":\"Top10 ssl-login-fail by IP Last7D\"},{\"type\":\"lens\",\"gridData\":{\"x\":22,\"y\":18,\"w\":11,\"h\":18,\"i\":\"2388c7cf-e8ed-4a5f-949b-0d6d5984e26f\"},\"panelIndex\":\"2388c7cf-e8ed-4a5f-949b-0d6d5984e26f\",\"embeddableConfig\":{\"attributes\":{\"title\":\"\",\"visualizationType\":\"lnsDatatable\",\"type\":\"lens\",\"references\":[{\"type\":\"index-pattern\",\"id\":\"9847a50f-0acd-4182-8e6a-e285bde178db\",\"name\":\"indexpattern-datasource-layer-e479e4fa-dec1-4025-8b87-6374ed835fc8\"}],\"state\":{\"visualization\":{\"layerId\":\"e479e4fa-dec1-4025-8b87-6374ed835fc8\",\"layerType\":\"data\",\"columns\":[{\"columnId\":\"86d95f81-79b0-410a-8d77-f1baa7edec62\",\"isTransposed\":false,\"isMetric\":false},{\"columnId\":\"2454ffc9-c930-4020-9556-40327e7ca3d9\",\"isTransposed\":false,\"isMetric\":true},{\"columnId\":\"a6b2a2a4-0506-47e9-89eb-14d5764bb91b\",\"isTransposed\":false,\"isMetric\":false,\"hidden\":true}]},\"query\":{\"query\":\"fortinet.firewall.action : \\\"ssl-login-fail\\\" \",\"language\":\"kuery\"},\"filters\":[],\"datasourceStates\":{\"formBased\":{\"layers\":{\"e479e4fa-dec1-4025-8b87-6374ed835fc8\":{\"columns\":{\"86d95f81-79b0-410a-8d77-f1baa7edec62\":{\"label\":\"Top 10 values of related.ip\",\"dataType\":\"ip\",\"operationType\":\"terms\",\"scale\":\"ordinal\",\"sourceField\":\"related.ip\",\"isBucketed\":true,\"params\":{\"size\":10,\"orderBy\":{\"type\":\"column\",\"columnId\":\"2454ffc9-c930-4020-9556-40327e7ca3d9\"},\"orderDirection\":\"desc\",\"otherBucket\":true,\"missingBucket\":false,\"parentFormat\":{\"id\":\"terms\"},\"include\":[],\"exclude\":[],\"includeIsRegex\":false,\"excludeIsRegex\":false,\"secondaryFields\":[]}},\"2454ffc9-c930-4020-9556-40327e7ca3d9\":{\"label\":\"Count of related.ip\",\"dataType\":\"number\",\"operationType\":\"count\",\"isBucketed\":false,\"scale\":\"ratio\",\"sourceField\":\"related.ip\",\"params\":{\"emptyAsNull\":true}},\"a6b2a2a4-0506-47e9-89eb-14d5764bb91b\":{\"label\":\"Filters\",\"dataType\":\"string\",\"operationType\":\"filters\",\"scale\":\"ordinal\",\"isBucketed\":true,\"params\":{\"filters\":[{\"input\":{\"query\":\"fortinet.firewall.action : ssl-login-fail\",\"language\":\"kuery\"},\"label\":\"\"}]}}},\"columnOrder\":[\"86d95f81-79b0-410a-8d77-f1baa7edec62\",\"a6b2a2a4-0506-47e9-89eb-14d5764bb91b\",\"2454ffc9-c930-4020-9556-40327e7ca3d9\"],\"sampling\":1,\"ignoreGlobalFilters\":false,\"incompleteColumns\":{},\"indexPatternId\":\"9847a50f-0acd-4182-8e6a-e285bde178db\"}},\"currentIndexPatternId\":\"9847a50f-0acd-4182-8e6a-e285bde178db\"},\"indexpattern\":{\"layers\":{}},\"textBased\":{\"layers\":{}}},\"internalReferences\":[],\"adHocDataViews\":{}}},\"hidePanelTitles\":false,\"enhancements\":{},\"timeRange\":{\"from\":\"now-24h/h\",\"to\":\"now\"}},\"title\":\"Top10 ssl-login-fail by IP Last24h\"},{\"type\":\"lens\",\"gridData\":{\"x\":33,\"y\":18,\"w\":11,\"h\":18,\"i\":\"f7c9acd9-80de-40b6-b0f7-99e2cdd94120\"},\"panelIndex\":\"f7c9acd9-80de-40b6-b0f7-99e2cdd94120\",\"embeddableConfig\":{\"attributes\":{\"title\":\"\",\"visualizationType\":\"lnsDatatable\",\"type\":\"lens\",\"references\":[{\"type\":\"index-pattern\",\"id\":\"9847a50f-0acd-4182-8e6a-e285bde178db\",\"name\":\"indexpattern-datasource-layer-e479e4fa-dec1-4025-8b87-6374ed835fc8\"}],\"state\":{\"visualization\":{\"layerId\":\"e479e4fa-dec1-4025-8b87-6374ed835fc8\",\"layerType\":\"data\",\"columns\":[{\"columnId\":\"86d95f81-79b0-410a-8d77-f1baa7edec62\",\"isTransposed\":false,\"isMetric\":false},{\"columnId\":\"2454ffc9-c930-4020-9556-40327e7ca3d9\",\"isTransposed\":false,\"isMetric\":true},{\"columnId\":\"a6b2a2a4-0506-47e9-89eb-14d5764bb91b\",\"isTransposed\":false,\"isMetric\":false,\"hidden\":true}]},\"query\":{\"query\":\"fortinet.firewall.action : \\\"ssl-login-fail\\\" \",\"language\":\"kuery\"},\"filters\":[],\"datasourceStates\":{\"formBased\":{\"layers\":{\"e479e4fa-dec1-4025-8b87-6374ed835fc8\":{\"columns\":{\"86d95f81-79b0-410a-8d77-f1baa7edec62\":{\"label\":\"Top 10 values of related.ip\",\"dataType\":\"ip\",\"operationType\":\"terms\",\"scale\":\"ordinal\",\"sourceField\":\"related.ip\",\"isBucketed\":true,\"params\":{\"size\":10,\"orderBy\":{\"type\":\"column\",\"columnId\":\"2454ffc9-c930-4020-9556-40327e7ca3d9\"},\"orderDirection\":\"desc\",\"otherBucket\":true,\"missingBucket\":false,\"parentFormat\":{\"id\":\"terms\"},\"include\":[],\"exclude\":[],\"includeIsRegex\":false,\"excludeIsRegex\":false,\"secondaryFields\":[]}},\"2454ffc9-c930-4020-9556-40327e7ca3d9\":{\"label\":\"Count of related.ip\",\"dataType\":\"number\",\"operationType\":\"count\",\"isBucketed\":false,\"scale\":\"ratio\",\"sourceField\":\"related.ip\",\"params\":{\"emptyAsNull\":true}},\"a6b2a2a4-0506-47e9-89eb-14d5764bb91b\":{\"label\":\"Filters\",\"dataType\":\"string\",\"operationType\":\"filters\",\"scale\":\"ordinal\",\"isBucketed\":true,\"params\":{\"filters\":[{\"input\":{\"query\":\"fortinet.firewall.action : ssl-login-fail\",\"language\":\"kuery\"},\"label\":\"\"}]}}},\"columnOrder\":[\"86d95f81-79b0-410a-8d77-f1baa7edec62\",\"a6b2a2a4-0506-47e9-89eb-14d5764bb91b\",\"2454ffc9-c930-4020-9556-40327e7ca3d9\"],\"sampling\":1,\"ignoreGlobalFilters\":false,\"incompleteColumns\":{},\"indexPatternId\":\"9847a50f-0acd-4182-8e6a-e285bde178db\"}},\"currentIndexPatternId\":\"9847a50f-0acd-4182-8e6a-e285bde178db\"},\"indexpattern\":{\"layers\":{}},\"textBased\":{\"layers\":{}}},\"internalReferences\":[],\"adHocDataViews\":{}}},\"hidePanelTitles\":false,\"enhancements\":{},\"timeRange\":{\"from\":\"now-15m\",\"to\":\"now\"}},\"title\":\"Top10 ssl-login-fail by IP Last15Min\"}]",
+                "title": "Fortigatge-SSL-VPN"
+            },
+            "references": [
+                {
+                    "type": "index-pattern",
+                    "id": "9847a50f-0acd-4182-8e6a-e285bde178db",
+                    "name": "7f79f652-8d41-4bbf-b637-c31c4f51c618:indexpattern-datasource-layer-e479e4fa-dec1-4025-8b87-6374ed835fc8"
+                },
+                {
+                    "type": "index-pattern",
+                    "id": "9847a50f-0acd-4182-8e6a-e285bde178db",
+                    "name": "67c6033a-4c67-43d8-ba41-e9692cda823e:indexpattern-datasource-layer-e479e4fa-dec1-4025-8b87-6374ed835fc8"
+                },
+                {
+                    "type": "index-pattern",
+                    "id": "9847a50f-0acd-4182-8e6a-e285bde178db",
+                    "name": "e3b67f05-cb9a-4a39-ac60-6deb9440a537:indexpattern-datasource-layer-e479e4fa-dec1-4025-8b87-6374ed835fc8"
+                },
+                {
+                    "type": "index-pattern",
+                    "id": "9847a50f-0acd-4182-8e6a-e285bde178db",
+                    "name": "c4cc157d-8433-43fc-838e-f52b137c8628:indexpattern-datasource-layer-e479e4fa-dec1-4025-8b87-6374ed835fc8"
+                },
+                {
+                    "type": "index-pattern",
+                    "id": "9847a50f-0acd-4182-8e6a-e285bde178db",
+                    "name": "778fcadc-e595-4746-b1c6-2f0ebcd0d8e2:indexpattern-datasource-layer-e479e4fa-dec1-4025-8b87-6374ed835fc8"
+                },
+                {
+                    "type": "index-pattern",
+                    "id": "9847a50f-0acd-4182-8e6a-e285bde178db",
+                    "name": "a4252509-9017-482d-84dc-d258185f1a2e:indexpattern-datasource-layer-e479e4fa-dec1-4025-8b87-6374ed835fc8"
+                },
+                {
+                    "type": "index-pattern",
+                    "id": "9847a50f-0acd-4182-8e6a-e285bde178db",
+                    "name": "2388c7cf-e8ed-4a5f-949b-0d6d5984e26f:indexpattern-datasource-layer-e479e4fa-dec1-4025-8b87-6374ed835fc8"
+                },
+                {
+                    "type": "index-pattern",
+                    "id": "9847a50f-0acd-4182-8e6a-e285bde178db",
+                    "name": "f7c9acd9-80de-40b6-b0f7-99e2cdd94120:indexpattern-datasource-layer-e479e4fa-dec1-4025-8b87-6374ed835fc8"
+                },
+                {
+                    "type": "tag",
+                    "id": "db73bb49-e0b8-4a21-82ca-a929fcd7c44e",
+                    "name": "tag-ref-db73bb49-e0b8-4a21-82ca-a929fcd7c44e"
+                },
+                {
+                    "type": "tag",
+                    "id": "security-solution-default",
+                    "name": "tag-ref-security-solution-default"
+                },
+                {
+                    "type": "tag",
+                    "id": "0fb72d0f-0c8d-4845-9083-d397f5253b9d",
+                    "name": "tag-ref-0fb72d0f-0c8d-4845-9083-d397f5253b9d"
+                },
+                {
+                    "type": "tag",
+                    "id": "8e981bda-ae2f-418b-a330-1982913dc0e7",
+                    "name": "tag-ref-8e981bda-ae2f-418b-a330-1982913dc0e7"
+                }
+            ],
+            "managed": false,
+            "coreMigrationVersion": "8.8.0",
+            "typeMigrationVersion": "8.9.0"
+        },
+        {
+            "id": "9847a50f-0acd-4182-8e6a-e285bde178db",
+            "type": "index-pattern",
+            "namespaces": [
+                "default"
+            ],
+            "updated_at": "2024-07-23T17:41:07.807Z",
+            "created_at": "2024-03-19T13:54:25.932Z",
+            "version": "WzQyMzAsMTdd",
+            "attributes": {
+                "fieldAttrs": "{}",
+                "fieldFormatMap": "{}",
+                "fields": "[]",
+                "name": "filebeat-*",
+                "runtimeFieldMap": "{}",
+                "sourceFilters": "[]",
+                "timeFieldName": "@timestamp",
+                "title": "filebeat-*",
+                "typeMeta": "{}",
+                "allowHidden": false
+            },
+            "references": [],
+            "managed": false,
+            "coreMigrationVersion": "8.8.0",
+            "typeMigrationVersion": "8.0.0"
+        },
+        {
+            "id": "db73bb49-e0b8-4a21-82ca-a929fcd7c44e",
+            "type": "tag",
+            "namespaces": [
+                "default"
+            ],
+            "updated_at": "2024-03-27T15:42:02.730Z",
+            "created_at": "2024-03-27T15:42:02.730Z",
+            "version": "WzEwNDk1LDZd",
+            "attributes": {
+                "name": "Fortigate",
+                "description": "",
+                "color": "#D6BF57"
+            },
+            "references": [],
+            "managed": false,
+            "coreMigrationVersion": "8.8.0",
+            "typeMigrationVersion": "8.0.0"
+        },
+        {
+            "id": "security-solution-default",
+            "type": "tag",
+            "namespaces": [
+                "default"
+            ],
+            "updated_at": "2024-03-19T13:54:26.447Z",
+            "created_at": "2024-03-19T13:54:26.447Z",
+            "version": "WzIwLDFd",
+            "attributes": {
+                "name": "Security Solution",
+                "description": "Tag defined in package-spec",
+                "color": "#9696F1"
+            },
+            "references": [],
+            "managed": false,
+            "coreMigrationVersion": "8.8.0",
+            "typeMigrationVersion": "8.0.0"
+        },
+        {
+            "id": "0fb72d0f-0c8d-4845-9083-d397f5253b9d",
+            "type": "tag",
+            "namespaces": [
+                "default"
+            ],
+            "updated_at": "2024-03-27T15:34:35.229Z",
+            "created_at": "2024-03-27T15:34:35.229Z",
+            "version": "WzEwNDQ3LDZd",
+            "attributes": {
+                "name": "VPN",
+                "description": "",
+                "color": "#9531ee"
+            },
+            "references": [],
+            "managed": false,
+            "coreMigrationVersion": "8.8.0",
+            "typeMigrationVersion": "8.0.0"
+        },
+        {
+            "id": "8e981bda-ae2f-418b-a330-1982913dc0e7",
+            "type": "tag",
+            "namespaces": [
+                "default"
+            ],
+            "updated_at": "2024-08-30T13:09:08.671Z",
+            "created_at": "2024-08-30T13:09:08.671Z",
+            "version": "WzE2MzAwMCwyM10=",
+            "attributes": {
+                "name": "Network",
+                "description": "",
+                "color": "#1ebb09"
+            },
+            "references": [],
+            "managed": false,
+            "coreMigrationVersion": "8.8.0",
+            "typeMigrationVersion": "8.0.0"
+        }
+    ]
+}

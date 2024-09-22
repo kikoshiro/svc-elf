@@ -1,0 +1,184 @@
+## Filebeat configuration
+## https://github.com/elastic/beats/blob/main/deploy/docker/filebeat.docker.yml
+#
+
+name: d1vsh05nelk01.ivu-ag.com
+
+logging.level: warning
+#logging.level: debug
+
+filebeat.config:
+  modules:
+    path: ${path.config}/modules.d/*.yml
+    reload.enabled: false
+
+#filebeat.autodiscover:
+#  providers:
+#    # The Docker autodiscover provider automatically retrieves logs from Docker
+#    # containers as they start and stop.
+#    - type: docker
+#      hints.enabled: true
+
+#processors:
+#  - add_cloud_metadata: ~
+
+monitoring:
+  enabled: true
+  elasticsearch:
+    username: beats_system
+    password: ${BEATS_SYSTEM_PASSWORD}
+
+output.elasticsearch:
+  hosts: [ http://elasticsearch:9200 ]
+  username: filebeat_internal
+  password: ${FILEBEAT_INTERNAL_PASSWORD}
+
+## HTTP endpoint for health checking
+## https://www.elastic.co/guide/en/beats/filebeat/current/http-endpoint.html
+#
+
+http:
+  enabled: true
+  host: 0.0.0.0
+
+filebeat.inputs:
+#- type: syslog
+#  enabled: true
+#  format: rfc5424
+#  protocol.udp:
+#    host: "0.0.0.0:5424"
+
+
+### "aruba.aox"
+
+  - type: udp
+    enabled: true
+    host: "0.0.0.0:9001"
+    max_message_size: 10KiB
+    fields_under_root: true
+    processors:
+      - add_fields:
+          target: ''
+          fields:
+            event.dataset: "aruba.aox"
+  
+      - syslog:
+          format: rfc5424
+          timezone: "UTC"  # Set to match the timezone of your logs.
+          field: "message"  # The field in the event that contains the syslog message.
+  
+  
+  ### hpv
+  
+  - type: udp
+    enabled: true
+    host: "0.0.0.0:9008"
+    max_message_size: 10KiB
+    fields_under_root: true
+    processors:
+      - add_fields:
+          target: ''
+          fields:
+            event.dataset: "hpv"
+  
+      - syslog:
+          format: rfc3164
+          timezone: "UTC"  # Set to match the timezone of your logs.
+          field: "message"  # The field in the event that contains the syslog message.
+  
+  ### "juniper"
+  
+  - type: udp
+    enabled: true
+    host: "0.0.0.0:9010"
+    max_message_size: 10KiB
+    fields_under_root: true
+    fields:
+      observer:
+        vendor: "Juniper"
+        product: "Junos"
+        type: "Routers"
+  
+  
+    processors:
+      - add_fields:
+          target: ''
+          fields:
+            event.dataset: "juniper.junos"
+  
+      - syslog:
+          format: rfc5424
+          timezone: "UTC"  # Set to match the timezone of your logs.
+          field: "message"  # The field in the event that contains the syslog message.
+  
+  
+filebeat.modules:
+
+
+#  - module: juniper
+#    junos:
+#      enabled: true
+#      var.input: udp
+#      var.syslog_host: 0.0.0.0
+#      var.syslog_port: 9010
+#      var.rsa_fields: true
+
+
+
+
+
+
+#  - module: cef
+#    log:
+#      enabled: true
+#      var:
+#        syslog_host: 0.0.0.0
+#        syslog_port: 9003
+#        #input: udp
+#
+#        # Set internal security zones. used to override parsed network.direction
+#        # based on zone egress and ingress
+#        #var.internal_zones: [ "Internal" ]
+#
+#        # Set external security zones. used to override parsed network.direction
+#        # based on zone egress and ingress
+#        #var.external_zones: [ "External" ]
+#
+#
+
+
+  - module: fortinet
+    firewall:
+      # Overwrite the Default-Pipeline
+      input.pipeline: fortinet-firewall-pipeline
+
+      # Set which input to use between tcp, udp (default) or file.
+      var.input: udp
+
+      # The interface to listen to syslog traffic. Defaults to
+      # localhost. Set to 0.0.0.0 to bind to all available interfaces.
+      var.syslog_host: 0.0.0.0
+
+      # The port to listen for syslog traffic. Defaults to 9004.
+      var.syslog_port: 9004
+
+      # Set internal interfaces. used to override parsed network.direction
+      # based on a tagged interface. Both internal and external interfaces must be
+      # set to leverage this functionality.
+      #var.internal_interfaces: [ "LAN" ]
+
+      # Set external interfaces. used to override parsed network.direction
+      # based on a tagged interface. Both internal and external interfaces must be
+      # set to leverage this functionality.
+      #var.external_interfaces: [ "WAN" ]
+
+    clientendpoint:
+      enabled: false
+
+    fortimail:
+      enabled: false
+
+    fortimanager:
+      enabled: false
+
+

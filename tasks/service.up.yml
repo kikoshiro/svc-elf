@@ -1,0 +1,9 @@
+---
+
+- name: elk-up
+  ansible.builtin.command:
+    cmd:    "docker compose up -d"
+    chdir:  "{{ svc_elf__compose_dest }}"
+  become: yes
+  become_user:  "{{ ansible_user }}"
+

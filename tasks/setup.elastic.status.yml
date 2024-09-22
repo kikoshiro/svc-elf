@@ -1,0 +1,21 @@
+---
+
+
+- include_tasks:  setup.elastic.connection.yml
+
+- name: Retrieve Elastic-Cluster-Health
+  uri:
+    url: "https://{{ inventory_hostname }}:9200/_cluster/health?wait_for_status=yellow&timeout=50s"
+    method: GET
+    return_content: yes
+    headers:
+      Authorization: "{{ svc_elf__elk_uri_auth_basic }}"
+
+  register: svc_elf__reg_elastic_status
+  retries: 50
+  delay: 5
+  check_mode: false
+
+- debug:
+    var:  svc_elf__reg_elastic_status.json.status
+

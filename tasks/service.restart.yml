@@ -1,0 +1,10 @@
+---
+
+- name: elf-restart
+  when: svc_elf__reg_compose_dest.stat.exists | d( true )
+  ansible.builtin.command:
+    cmd:    "docker compose restart"
+    chdir:  "{{ svc_elf__compose_dest }}"
+  become: yes
+  become_user:  "{{ ansible_user }}"
+
